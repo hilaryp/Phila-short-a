@@ -44,10 +44,10 @@ if __name__ == "__main__":
              'HAND', 'HAM', 'HALF', 'PATH', 'PASS', 'CASH', 'BANG', 'BAT',
              'PAL', 'BAG', 'CAB', 'HAMMER', 'MANAGE', 'PLANET', 'PLANETS', 
              'MANNING', 'CLASSES', 'ASKING', 'CAN', 'BEGAN', 'ANNE',
-             'ASPECT', 'CASKET', 'ASKED', 'BASKETBALL', 'BANDSTAND',
+             'ASPECT', 'ASPIRIN', 'CASKET', 'ASKED', 'BASKETBALL', 'BANDSTAND',
              'BACKSTROKE', 'TRANSFER', "GLADDEN", "TRANSMISSION",
-             'SANTA', 'GRANDMA', 'RASCAL', "ASKIN'", "PASSIN'", 'PASSING']
-#TODO two modules code different vowel in 'FANTASTIC'?
+             'SANTA', 'GRANDMOTHER', 'RASCAL', "ASKIN'", "PASSIN'", 'PASSING',
+             'TRAFFIC', 'CATHOLIC', 'MARRY', 'SPANISH']
     for word in words:
         word_pron = pron[word]
         old_coding = is_tense_old(word, word_pron)
