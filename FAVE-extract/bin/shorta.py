@@ -16,8 +16,8 @@ POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST', 'BADNESS',
                        'GLADDENING', 'GLADNESS', 'GRANDMOTHER', 'GRANDMOTHERS',
                        "GRANDMOTHER'S", 'GRANDMA', 'SANTA', 'SANTAS', "SANTA'S",
                        'BATHROOM'])
-# TASKER candidate for pos exception, but should be ok with stemming changes
-UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'ANNE', 'ANNIE'])
+UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'ANNE', 'ANNIE', 'PLASTIC', 'PLASTICS',
+                            'ALASKA', 'ALASKAN', 'FANTASTIC'])
 
 
 def is_penultimate_syllable_resyllabified(word):

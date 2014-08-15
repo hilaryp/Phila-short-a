@@ -5,19 +5,22 @@ setwd('~/Desktop/Phila-short-a/')
 
 # read in data used for LSA paper
 PNC <- read.csv("PNC-IHELP_123113.csv")
-PNC2 <- droplevels(subset(PNC, !Word %in% c('A', 'AM', 'AN', "AN'", 'AND',
-                   'ARE', "AREN'T", 'AS', 'AT', 'BECAUSE', 'BUT','COULD',
-                   "DON'T", 'EH', 'FOR', 'FROM', 'GET', 'GONNA' , 'GOT',
-                   'GOTTA', 'GOTTEN', 'HAD', 'HAS', 'HAVE', 'HE', "HE'S",
-                   'HUH', 'I', "I'LL", "I'M", "I'VE", 'IN', 'IS', 'IT',
-                   "IT'S", 'ITS', 'JUST', 'MEAN', 'MY', 'NAH', 'NOT', 'OF',
-                   'OH', 'ON', 'OR', 'OUR', 'SAYS', 'SHE', "SHE'S", 'SHOULD',
-                   'SO', 'THAN', 'THAT', "THAT'S", 'THE', 'THEM', 'THERE',
-                   "THERE'S", 'THEY', 'TO', 'UH', 'UM', 'UP', 'WAS', "WASN'T",
-                   'WE', 'WERE', 'WHAT', 'WHEN', 'WHICH', 'WITH', 'WOULD',
-                   'YEAH', 'YOU', "YOU'VE", 'BASIL')))
+# monosyllablic function words from Selkirk 1984:352-353
+STOPWORDS <- c('A', 'ALL', 'AM', 'AN', 'AND', 'ARE', "AREN'T", 'AS', 
+                 'AT', 'BE', 'BEEN', 'BOTH', 'BUT', 'BY', 'CAN', "CAN'T", 
+                 'COULD', 'CUZ', 'DID', 'DO', 'DOES', 'DOWN', 'EACH', 
+                 'FOR', 'FROM', 'HAD', 'HAS', 'HAVE', 'HE', 'HER', 'HERE',
+                 'HIS', 'I', 'IF', 'IN', 'IS', 'IT', 'ITS', 'LIKE', 'MAY', 
+                 'ME', 'MIGHT', 'MUST', 'MY', 'NO', 'NOR', 'OF', 'ON', 
+                 'ONE', 'OR', 'OUR', 'OUT', 'ROUND', 'SHALL', 'SHE', 
+                 'SHOULD', 'SINCE', 'SO', 'SOME', 'SUCH', 'THAN', 'THAT', 
+                 'THE', 'THEIR', 'THEM', 'THESE', 'THEY', 'THIS', 'THOSE',
+                 'THROUGH', 'TILL', 'TO', 'TOO', 'UP', 'US', 'WAS', 'WE', 
+                 'WERE', 'WHAT', 'WHEN', 'WHO', 'WHOM', 'WHOSE', 'WHY', 
+                 'WILL', 'WITH', 'WOULD', 'YOU', 'YOUR', 'BASIL')
+PNC2 <- droplevels(subset(PNC, !Word %in% STOPWORDS))
 
-shorta <- droplevels(subset(PNC3, VClass %in% c('ae','aeh','aeBR')))
+shorta <- droplevels(subset(PNC2, VClass %in% c('ae','aeh','aeBR')))
 
 # make a giant pdf of every PNC speaker's short-a system
 pdf(file = "PNC-shorta.pdf", width=6, height=5, onefile=TRUE)

@@ -1,7 +1,6 @@
 word,count,reason
-        FAMILY,957,follV
+        FAMILY,957,lexical
        ITALIAN,588,follL
-           CAN,430,lexical
       CATHOLIC,369,lexical
            RAN,272,lexical
       FAMILIES,184,lexical
@@ -130,7 +129,6 @@ word,count,reason
       ALPHABET,6,follL
     CHALLENGED,6,follL
      SALVATORE,6,follL
-         SHALL,6,follL
       TALENTED,6,follL
            VAL,6,follL
       VALUABLE,6,follL
@@ -259,7 +257,7 @@ GEOGRAPHICALLY,5,follV
        DAMAGES,2,follV
        DYNAMIC,2,follV
         FACETS,2,follV
-         GASES,2,follV
+         GASES,2,lexical
   GEOGRAPHICAL,2,follV
      GLAMOROUS,2,follV
        HASSLES,2,follV
