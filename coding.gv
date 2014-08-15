@@ -1,0 +1,6 @@
+// vertices
+"posexcept" [label=<Is the word a positive exception (e.g., <i>mad</i>, <i>bad</i>, <i>glad</i>)?>];
+"negexcept" [label=<Is the word a negative exception?>];
+"tenser" [label=<Is the short-<i>a</i> followed by /m, n, f, th, s/?>];
+// edges
+"posexcept" -> "negexcept"
