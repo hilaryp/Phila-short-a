@@ -1,6 +1,41 @@
-// vertices
-"posexcept" [label=<Is the word a positive exception (e.g., <i>mad</i>, <i>bad</i>, <i>glad</i>)?>];
-"negexcept" [label=<Is the word a negative exception?>];
-"tenser" [label=<Is the short-<i>a</i> followed by /m, n, f, th, s/?>];
-// edges
-"posexcept" -> "negexcept"
+digraph coding {
+    //splines=polyline;
+
+    node [shape=plaintext fontname="TimesNewRomanPSMT"];
+    
+    // vertices
+    "posexcept?"     [label=<Is the word a positive exception ( <i>mad</i>, <i>bad</i>, <i>glad</i>)?>];
+    "negexcept?"     [label=<Is the word a negative exception ( <i>aspirin</i>)?>];
+    "tenser?"        [label="Following {m, n, f, θ, s}?"];
+    "tenser-vowel?"  [label="Following {m, n, f, θ, s}V?"];
+    "sC?"            [label="Following sC?"];
+    //"maxons?"        [label=<Following __ C<sub>1</sub> (where C<sub>1</sub> is a possible onset)?>];
+    "maxons?"        [label=<Following CC+ which is a valid onset?>];
+    "resyllab?"      [label="Following {m, n, f, θ, s}-{əd, əz, ɪŋ}?"];
+
+    node [shape=circle fixedsize=true];
+    "ae" [label="(ae)"];
+    "aeh" [label="(aeh)"];
+
+    // edges
+    "posexcept?"    -> "aeh"               [label=<  yes>];
+    "posexcept?"    -> "negexcept?"        [label=<  no>];
+
+    "negexcept?"    -> "ae"                [label=<  yes>];
+    "negexcept?"    -> "tenser?"           [label=<  no>];
+
+    "tenser?"       -> "tenser-vowel?"     [label=<  yes>]
+    "tenser?"       -> "ae"                [label=<  no>];
+
+    "tenser-vowel?" -> "resyllab?"         [label=<  yes>];
+    "tenser-vowel?" -> "sC?"               [label=<  no>];
+
+    "resyllab?"     -> "aeh"               [label=<  yes>];
+    "resyllab?"     -> "ae"                [label=<  no>];
+
+    "sC?"           -> "aeh"               [label=<  yes>];
+    "sC?"           -> "maxons?"           [label=<  no>];
+    
+    "maxons?"       -> "aeh"               [label=<  yes>];
+    "maxons?"       -> "ae"                [label=<  no>];
+}
