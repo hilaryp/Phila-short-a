@@ -4,20 +4,24 @@
 from syllabify import syllabify
 from stem import stem_infl as STEM
 
+# List of exceptions derived from Ferguson 1972, Labov 1989, and Labov 1994.
+# Additional items included to counteract CMU pronunication variations and as 
+# the result of sC cluster analysis presented in Prichard & Gorman forthcoming.
+
 TENSERS = frozenset(['M', 'N', 'S', 'TH', 'F'])
-NEGATIVE_EXCEPTIONS = frozenset(['AM', 'RAN', 'SWAM', 'MATH', 'EXAM', 'ALAS', 'FAMILY',
-                       'FAMILIES', "FAMILY'S", 'CATHOLIC', 'CATHOLICS',
+NEGATIVE_EXCEPTIONS = frozenset(['AM', 'RAN', 'SWAM', 'MATH', 'EXAM', 'ALAS', 
+                       'FAMILY', 'FAMILIES', "FAMILY'S", 'CATHOLIC', 'CATHOLICS',
                        'CAMERA', 'CATHERINE', "CATHERINE'S", 'ASPECT', 'ASPECTS', 
-                       'ASPIRIN', 'ASPIRINS', 'FANTASTIC', 'RASCAL', 'RASCALS'])
+                       'ASPIRIN', 'ASPIRINS', 'FANTASTIC', 'RASCAL', 'RASCALS',
+                       'ASPHALT', 'BLASPHEMY'])
 POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST', 'BADNESS', 
-                       'BADMINTON', 'BADMINTONS', 'MAD', 'MADLY', 'MADDEN', 
-                       'MADDENING', 'MADDENINGLY', 'MADDER', 'MADNESS', 'GLAD',
-                       'GLADLY', 'GLADDER', 'GLADDEST', 'GLADDEN', 
-                       'GLADDENING', 'GLADNESS', 'GRANDMOTHER', 'GRANDMOTHERS',
-                       "GRANDMOTHER'S", 'GRANDMA', 'SANTA', 'SANTAS', "SANTA'S",
-                       'BATHROOM'])
+                       'MAD', 'MADLY', 'MADDEN', 'MADDENING', 'MADDENINGLY', 
+                       'MADDER', 'MADNESS', 'GLAD', 'GLADLY', 'GLADDER', 
+                       'GLADDEST', 'GLADDEN', 'GLADDENING', 'GLADNESS', 
+                       'GRANDMOTHER', 'GRANDMOTHERS', "GRANDMOTHER'S", 'GRANDMA', 
+                       'SANTA', 'SANTAS', "SANTA'S", 'BATHROOM'])
 UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'ANNE', 'ANNIE', 'PLASTIC', 'PLASTICS',
-                            'ALASKA', 'ALASKAN', 'FANTASTIC'])
+                            'PLANET', 'ALASKA', 'ALASKAN'])
 
 
 def is_penultimate_syllable_resyllabified(word):
