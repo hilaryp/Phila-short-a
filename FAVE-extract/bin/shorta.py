@@ -4,24 +4,30 @@
 from syllabify import syllabify
 from stem import stem_infl as STEM
 
-# List of exceptions derived from Ferguson 1972, Labov 1989, and Labov 1994.
-# Additional items included to counteract CMU pronunication variations and as 
-# the result of sC cluster analysis presented in Prichard & Gorman forthcoming.
+# List of exceptions derived from Ferguson 1972, Labov 1989, and Labov 
+# 1994. Additional items included to counteract CMU pronunication 
+# variations and as the result of sC cluster analysis presented in 
+# Prichard & Gorman forthcoming.
 
 TENSERS = frozenset(['M', 'N', 'S', 'TH', 'F'])
-NEGATIVE_EXCEPTIONS = frozenset(['AM', 'RAN', 'SWAM', 'MATH', 'EXAM', 'ALAS', 
-                       'FAMILY', 'FAMILIES', "FAMILY'S", 'CATHOLIC', 'CATHOLICS',
-                       'CAMERA', 'CATHERINE', "CATHERINE'S", 'ASPECT', 'ASPECTS', 
-                       'ASPIRIN', 'ASPIRINS', 'FANTASTIC', 'RASCAL', 'RASCALS',
-                       'ASPHALT', 'BLASPHEMY'])
-POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST', 'BADNESS', 
-                       'MAD', 'MADLY', 'MADDEN', 'MADDENING', 'MADDENINGLY', 
-                       'MADDER', 'MADNESS', 'GLAD', 'GLADLY', 'GLADDER', 
-                       'GLADDEST', 'GLADDEN', 'GLADDENING', 'GLADNESS', 
-                       'GRANDMOTHER', 'GRANDMOTHERS', "GRANDMOTHER'S", 'GRANDMA', 
-                       'SANTA', 'SANTAS', "SANTA'S", 'BATHROOM'])
-UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'ANNE', 'ANNIE', 'PLASTIC', 'PLASTICS',
-                            'PLANET', 'ALASKA', 'ALASKAN'])
+NEGATIVE_EXCEPTIONS = frozenset(['AM', 'RAN', 'SWAM', 'MATH', 'EXAM', 
+                                 'ALAS', 'FAMILY', 'FAMILIES', "FAMILY'S",                                  'CATHOLIC', 'CATHOLICS', 'CAMERA', 
+                                 'CAMERAS', 'CATHERINE', "CATHERINE'S", 
+                                 'ASPECT', 'ASPECTS', 'ASPIRIN',
+                                 'ASPIRINS', 'FANTASTIC', 'RASCAL', 
+                                 'RASCALS', 'ASPHALT', 'BLASPHEMY'])
+POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST', 
+                                 'BADNESS', 'MAD', 'MADLY', 'MADDEN', 
+                                 'MADDENING', 'MADDENINGLY', 'MADDER', 
+                                 'MADNESS', 'GLAD', 'GLADLY', 'GLADDER', 
+                                 'GLADDEST', 'GLADDEN', 'GLADDENING', 
+                                 'GLADNESS', 'GRANDMOTHER', 'GRANDMOTHERS',
+                                 "GRANDMOTHER'S", 'GRANDMA', 'SANTA', 
+                                 'SANTAS', "SANTA'S", 'BATHROOM', 
+                                 'BATHROOMS'])
+UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'ANNE', 'ANNIE', 'PLASTIC', 
+                            'PLASTICS', 'PLANET', 'PLANETS', 'ALASKA', 
+                            'ALASKAN'])
 
 
 def is_penultimate_syllable_resyllabified(word):
@@ -78,6 +84,8 @@ def is_tense(word, pron):
     ...         continue
     ...     (word, pron_string) = line.rstrip().split('  ', 1)
     ...     pron[word] = pron_string.split()
+
+    # and, because it's not in the dictionary...
     >>> pron['GLADDEST'] = pron['GLAD'] + ['EH0', 'S', 'T']
 
     Positive exceptions:
@@ -131,10 +139,6 @@ def is_tense(word, pron):
     False
     >>> is_tense('MANAGE', pron['MANAGE'])
     False
-    >>> is_tense('PLANET', pron['PLANET'])
-    False
-    >>> is_tense('PLANETS', pron['PLANETS'])
-    False
 
     Opaque tensing in (re)open(ed) syllables:
     >>> is_tense('MANNING', pron['MANNING'])
@@ -143,13 +147,15 @@ def is_tense(word, pron):
     True
     >>> is_tense('ASKING', pron['ASKING'])
     True
-    >>> is_tense("PASSIN'", pron["PASSIN'"]) # Did we catch -in' transcriptions?
+    >>> is_tense("PASSIN'", pron["PASSIN'"]) # Did we catch "-in'"?
     True
 
     (lexically) Unclassifiable:
     >>> is_tense('CAN', pron['CAN'])
     >>> is_tense('BEGAN', pron['BEGAN'])
     >>> is_tense('ANNE', pron['ANNE'])
+    >>> is_tense('PLANET', pron['PLANET'])
+    >>> is_tense('PLANETS', pron['PLANETS'])
 
     Formerly unclassifiable sC:
     >>> is_tense('ASPECT', pron['ASPECT'])
@@ -160,7 +166,6 @@ def is_tense(word, pron):
     True
     >>> is_tense('BASKETBALL', pron['BASKETBALL'])
     True
-    
 
     Previously incorrectly marked as "unclassifiable":
     >>> is_tense('BANDSTAND', pron['BANDSTAND'])
@@ -174,7 +179,7 @@ def is_tense(word, pron):
     >>> is_tense('TRANSFER', pron['TRANSFER'])
     True
  
-    not handled yet: schwa-apocope (e.g., CAMERA), SANTA (when /t/ deleted)
+    Not handled yet: schwa-apocope (e.g., CAMERA), SANTA (when /t/ deleted)
     """
     if word.endswith("IN'"):
         word = word[:-1] + 'G'
@@ -188,9 +193,8 @@ def is_tense(word, pron):
     # parse syllables, with "Alaska rule" ON 
     syls = syllabify(pron)
     (onset, nucleus, coda) = syls[0]
-    # in my syllable-parsing scheme, 'r' is parsed into the nucleus in 
-    # certain contexts; in this case the vowel is lax regardless of the 
-    # coda's contents
+    # we assume that R is parsed into the nucleus in certain contexts; in 
+    # this case the vowel is lax regardless of the coda's contents
     if len(nucleus) > 1 and nucleus[1] == 'R':
         return False
     # check for tautosyllabic tensing segment at the start of the coda
@@ -205,7 +209,6 @@ def is_tense(word, pron):
                 return True
     return False
     
-
 
 if __name__ == '__main__':
     import doctest
