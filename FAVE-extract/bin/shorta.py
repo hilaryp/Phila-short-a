@@ -11,10 +11,11 @@ from stem import stem_infl as STEM
 
 TENSERS = frozenset(['M', 'N', 'S', 'TH', 'F'])
 NEGATIVE_EXCEPTIONS = frozenset(['AM', 'RAN', 'SWAM', 'MATH', 'EXAM', 
-                                 'ALAS', 'FAMILY', 'FAMILIES', "FAMILY'S",                                  'CATHOLIC', 'CATHOLICS', 'CAMERA', 
+                                 'ALAS', 'FAMILY', 'FAMILIES', "FAMILY'S",
+                                 'CATHOLIC', 'CATHOLICS', 'CAMERA', 
                                  'CAMERAS', 'CATHERINE', "CATHERINE'S", 
                                  'ASPECT', 'ASPECTS', 'ASPIRIN',
-                                 'ASPIRINS', 'FANTASTIC', 'RASCAL', 
+                                 'ASPIRINS', 'RASCAL', 
                                  'RASCALS', 'ASPHALT', 'BLASPHEMY'])
 POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST', 
                                  'BADNESS', 'MAD', 'MADLY', 'MADDEN', 
@@ -27,7 +28,7 @@ POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST',
                                  'BATHROOMS'])
 UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'ANNE', 'ANNIE', 'PLASTIC', 
                             'PLASTICS', 'PLANET', 'PLANETS', 'ALASKA', 
-                            'ALASKAN'])
+                            'ALASKAN', 'FANTASTIC'])
 
 
 def is_penultimate_syllable_resyllabified(word):
