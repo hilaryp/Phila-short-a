@@ -1,11 +1,13 @@
 // to compile me, try:
-//      dot -Tpdf:cairo:cairo -o coding.pdf coding.gv
+//      dot -Ttiff:cairo:quartz -o coding.tiff coding.gv
+//
+// or similar for non-TIFF outputs
 
 digraph coding {
     //splines=polyline;
 
-    node [shape=plaintext fontname="Times New Roman"];
-    edge [fontname="TimesNewRomanPSMT"];
+    node [shape=plaintext fontname="serif"];
+    edge [fontname="serif"];
 
     // vertices
     "posexcept?"     [label=<Is the word a positive exception (<i>mad</i>, <i>bad</i>, <i>glad</i>)?>];
@@ -13,7 +15,7 @@ digraph coding {
     "tenser?"        [label="Following {m, n, f, θ, s}?"];
     "closed?"        [label="Is the syllable closed?"];
     
-    node [shape=circle fixedsize=true fontname="TimesNewRomanPSMT"];
+    node [shape=circle fixedsize=true];
     "ae" [label="ae"];
     "aeh" [label="aeh"];
 
