@@ -3,10 +3,25 @@
 
 setwd('~/Desktop/Phila-short-a/')
 
-# read in data used for LSA paper
-PNC <- read.csv("PNC-IHELP_123113.csv")
+# read in speaker demographics
+info <- read.csv("~/Desktop/Higher_Ed/Data/SpkInfo.csv")
+
+# Process original coding
+olda <- read.csv("~/Desktop/Higher_Ed/Data/PNC-2014-09-12.csv")
+olda2 <- merge(olda, info, all.x=TRUE, all.y=FALSE)
+olda3 <- droplevels(subset(olda2, 
+                           !Ethnicity %in% c("", "a", "a/o", "a/w", "h", "o",
+                                             "s", "s/p", "u", "b", "b/w")
+                           & Age >= 18))
+
+# Process new coding
+newa <- read.csv("~/Desktop/Higher_Ed/Data/PNC-2014-09-15-newa.csv")
+newa2 <- merge(newa, info, all.x=TRUE, all.y=FALSE)
+newa3 <- droplevels(subset(newa2, Ethnicity == "w" & Age >= 18))
+
+
 # monosyllablic function words from Selkirk 1984:352-353
-STOPWORDS <- c('A', 'ALL', 'AM', 'AN', 'AND', 'ARE', "AREN'T", 'AS', 
+STOPWORDS <- c('A', 'ALL', 'AM', 'AN', 'AND', "AN'", 'ARE', "AREN'T", 'AS', 
                  'AT', 'BE', 'BEEN', 'BOTH', 'BUT', 'BY', 'CAN', "CAN'T", 
                  'COULD', 'CUZ', 'DID', 'DO', 'DOES', 'DOWN', 'EACH', 
                  'FOR', 'FROM', 'HAD', 'HAS', 'HAVE', 'HE', 'HER', 'HERE',
@@ -17,15 +32,19 @@ STOPWORDS <- c('A', 'ALL', 'AM', 'AN', 'AND', 'ARE', "AREN'T", 'AS',
                  'THE', 'THEIR', 'THEM', 'THESE', 'THEY', 'THIS', 'THOSE',
                  'THROUGH', 'TILL', 'TO', 'TOO', 'UP', 'US', 'WAS', 'WE', 
                  'WERE', 'WHAT', 'WHEN', 'WHO', 'WHOM', 'WHOSE', 'WHY', 
-                 'WILL', 'WITH', 'WOULD', 'YOU', 'YOUR', 'BASIL')
-PNC2 <- droplevels(subset(PNC, !Word %in% STOPWORDS))
+                 'WILL', 'WITH', 'WOULD', 'YEAH', 'YOU', 'YOUR', 'BASIL')
+olda4 <- droplevels(subset(olda3, !Word %in% STOPWORDS))
+newa4 <- droplevels(subset(newa3, !Word %in% STOPWORDS))
 
-shorta <- droplevels(subset(PNC2, VClass %in% c('ae','aeh','aeBR')))
+oldaf <- droplevels(subset(olda4, VClass %in% c('ae','aeh','aeBR')))
+newaf <- droplevels(subset(newa4, VClass %in% c('ae','aeh','aeBR')))
+
 
 # make a giant pdf of every PNC speaker's short-a system
+library(ggplot2)
 pdf(file = "PNC-shorta.pdf", width=6, height=5, onefile=TRUE)
-for (spk in levels(shorta$Subject)) {
-  print(ggplot(data=subset(shorta, Subject==spk), 
+for (spk in levels(oldaf$Subject)) {
+  print(ggplot(data=subset(oldaf, Subject==spk), 
                aes(F2, F1, color=VClass, label=Word))+
           geom_text(size=2)+
           scale_x_reverse()+
