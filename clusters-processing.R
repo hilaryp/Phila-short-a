@@ -1,44 +1,7 @@
-# August 2014
-# Short-a paper data processing
+# First pass analysis of old coding to reassign sC clusters
 
 setwd('~/Desktop/Phila-short-a/')
-
-# read in speaker demographics
-info <- read.csv("~/Desktop/Higher_Ed/Data/SpkInfo.csv")
-
-# Process original coding
-olda <- read.csv("~/Desktop/Higher_Ed/Data/PNC-2014-09-12.csv")
-olda2 <- merge(olda, info, all.x=TRUE, all.y=FALSE)
-olda3 <- droplevels(subset(olda2, 
-                           !Ethnicity %in% c("", "a", "a/o", "a/w", "h", "o",
-                                             "s", "s/p", "u", "b", "b/w")
-                           & Age >= 18))
-
-# Process new coding
-newa <- read.csv("~/Desktop/Higher_Ed/Data/PNC-2014-09-15-newa.csv")
-newa2 <- merge(newa, info, all.x=TRUE, all.y=FALSE)
-newa3 <- droplevels(subset(newa2, Ethnicity == "w" & Age >= 18))
-
-
-# monosyllablic function words from Selkirk 1984:352-353
-STOPWORDS <- c('A', 'ALL', 'AM', 'AN', 'AND', "AN'", 'ARE', "AREN'T", 'AS', 
-                 'AT', 'BE', 'BEEN', 'BOTH', 'BUT', 'BY', 'CAN', "CAN'T", 
-                 'COULD', 'CUZ', 'DID', 'DO', 'DOES', 'DOWN', 'EACH', 
-                 'FOR', 'FROM', 'HAD', 'HAS', 'HAVE', 'HE', 'HER', 'HERE',
-                 'HIS', 'I', 'IF', 'IN', 'IS', 'IT', 'ITS', 'LIKE', 'MAY', 
-                 'ME', 'MIGHT', 'MUST', 'MY', 'NO', 'NOR', 'OF', 'ON', 
-                 'ONE', 'OR', 'OUR', 'OUT', 'ROUND', 'SHALL', 'SHE', 
-                 'SHOULD', 'SINCE', 'SO', 'SOME', 'SUCH', 'THAN', 'THAT', 
-                 'THE', 'THEIR', 'THEM', 'THESE', 'THEY', 'THIS', 'THOSE',
-                 'THROUGH', 'TILL', 'TO', 'TOO', 'UP', 'US', 'WAS', 'WE', 
-                 'WERE', 'WHAT', 'WHEN', 'WHO', 'WHOM', 'WHOSE', 'WHY', 
-                 'WILL', 'WITH', 'WOULD', 'YEAH', 'YOU', 'YOUR', 'BASIL')
-olda4 <- droplevels(subset(olda3, !Word %in% STOPWORDS))
-newa4 <- droplevels(subset(newa3, !Word %in% STOPWORDS))
-
-oldaf <- droplevels(subset(olda4, VClass %in% c('ae','aeh','aeBR')))
-newaf <- droplevels(subset(newa4, VClass %in% c('ae','aeh','aeBR')))
-
+oldaf <- read.csv("shorta-old.csv")
 
 # make a giant pdf of every PNC speaker's short-a system
 library(ggplot2)
@@ -55,14 +18,22 @@ for (spk in levels(oldaf$Subject)) {
 dev.off()
 
 # remove the speakers who clearly don't have the traditional system
-philasys <- droplevels(subset(shorta, !Subject %in% c('IHP-1-2','IHP-2-1',
-                       'IHP-2-4','IHP-2-2', 'IHP-2-6','PH04-3-2','PH04-3-3',
-                       'PH06-2-6','PH10-1-4', 'PH10-1-5','PH10-1-7','PH10-2-6',
-                       'PH10-2-8','PH74-0-4', 'PH74-0-5','PH74-00-6','PH74-2-4',
-                       'PH74-2-8','PH76-4-6', 'PH78-5-3','PH84-2-1','PH87-1-3',
-                       'PH91-2-19','PH91-2-20', 'PH91-2-21','PH91-2-8',
-                       'PH92-2-1','PH97-3-2','PHI-M-1', 'PHI-M-2','PHI-M-4',
-                       'PHI-R-1','PHI-R-2','PHI-R-5')))
+philasys <- droplevels(subset(oldaf, !Subject %in% c('IHP1-1', 'IHP1-2',
+                       'IHP1-4', 'IHP1-5', 'IHP2-1', 'IHP2-11', 'IHP2-12',
+                       'IHP2-13', 'IHP2-14', 'IHP2-15', 'IHP2-16', 
+                       'IHP2-17', 'IHP2-19', 'IHP-2-2', 'IHP-2-22', 
+                       'IHP2-24', 'IHP2-25', 'IHP2-26', 'IHP2-3', 
+                       'IHP2-30', 'IHP2-35', 'IHP2-38', 'IHP2-39', 
+                       'IHP2-4', 'IHP2-40', 'IHP2-42', 'IHP2-44', 
+                       'IHP2-45', 'IHP2-48', 'IHP2-6', 'IHP2-7', 'IHP2-8',
+                       'IHP2-9', 'PH04-3-2', 'PH04-3-3', 'PH06-2-6', 
+                       'PH10-1-4', 'PH10-1-5', 'PH10-1-7', 'PH10-2-6',
+                       'PH10-2-8', 'PH74-0-4', 'PH74-0-5', 'PH74-00-6',
+                       'PH74-2-4', 'PH74-2-8', 'PH76-4-6', 'PH78-5-3',
+                       'PH84-2-1', 'PH87-1-3', 'PH91-2-19', 'PH91-2-20', 
+                       'PH91-2-21','PH91-2-8', 'PH92-2-1', 'PH97-3-2',
+                       'PHI-M-1', 'PHI-M-2', 'PHI-M-4', 'PHI-R-1', 
+                       'PHI-R-2', 'PHI-R-4' 'PHI-R-5', 'PHI-R-6', 'PHI-R-7')))
 
 # pull out s-cluster words
 clusters <- droplevels(subset(philasys, Word %in% c("ALABASTER", "ALASKA", 
@@ -183,12 +154,12 @@ for (spk in levels(clusters2$Subject)) {
 dev.off()
 
 ##### malanobis distances
-# all tense/lax tokens are in shorta2
-# cluster tokens are in cluster2
+# all tense/lax tokens are in oldaf
+# cluster tokens are in clusters2
 
 out <- data.frame(mahal_ae=1.0, mahal_aeh=1.0)
 for (speaker in levels(clusters2$Subject)){
-  data <- subset(shorta2, Subject==speaker)
+  data <- subset(oldaf, Subject==speaker)
   words <- subset(clusters2, Subject==speaker, select=c(F1,F2))
   ae_means <- c(mean(data[data$VClass=='ae',]$F1), mean(data[data$VClass=='ae',]$F2))
   aeh_means <- c(mean(data[data$VClass=='aeh',]$F1), mean(data[data$VClass=='aeh',]$F2))
@@ -209,7 +180,7 @@ sC.mahal$closer <- with(sC.mahal, ifelse(mahal_ae < mahal_aeh, "ae", "aeh"))
 # giant pdf of new codes and mahalanobis distances
 pdf(file = "~/Desktop/sc-mahal.pdf", width=6, height=5, onefile=TRUE)
 for (spk in levels(sC.mahal$Subject)) {
-  print(ggplot(data=subset(shorta, Subject==spk), aes(F2, F1, label=Word))+
+  print(ggplot(data=subset(oldaf, Subject==spk), aes(F2, F1, label=Word))+
           geom_text(size=2, alpha=.35)+
           geom_text(data=subset(sC.mahal, Subject==spk), 
                     aes(color=closer, 
