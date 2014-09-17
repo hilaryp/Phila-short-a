@@ -2,6 +2,7 @@
 # Short-a paper data processing
 
 setwd('~/Desktop/Phila-short-a/')
+library(plyr)
 
 # read in speaker demographics
 info <- read.csv("~/Desktop/Higher_Ed/Data/SpkInfo.csv")
@@ -38,8 +39,11 @@ STOPWORDS <- c('A', 'ALL', 'AM', 'AN', 'AND', "AN'", 'ARE', "AREN'T",
 olda4 <- droplevels(subset(olda3, !Word %in% STOPWORDS))
 newa4 <- droplevels(subset(newa3, !Word %in% STOPWORDS))
 
-oldaf <- droplevels(subset(olda4, VClass %in% c('ae','aeh','aeBR')))
-newaf <- droplevels(subset(newa4, VClass %in% c('ae','aeh','aeBR')))
+olda5 <- ddply(olda4, .(Subject), transform, Z1=scale(F1), Z2=scale(F2), DOB=Year-Age)
+newa5 <- ddply(newa4, .(Subject), transform, Z1=scale(F1), Z2=scale(F2), DOB=Year-Age)
+
+oldaf <- droplevels(subset(olda5, VClass %in% c('ae','aeh','aeBR')))
+newaf <- droplevels(subset(newa5, VClass %in% c('ae','aeh','aeBR')))
 
 write.csv(oldaf, "shorta-old.csv", row.names=FALSE, quote=FALSE)
 write.csv(newaf, "shorta-new.csv", row.names=FALSE, quote=FALSE)
