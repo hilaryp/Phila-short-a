@@ -42,8 +42,20 @@ newa4 <- droplevels(subset(newa3, !Word %in% STOPWORDS))
 olda5 <- ddply(olda4, .(Subject), transform, Z1=scale(F1), Z2=scale(F2), DOB=Year-Age)
 newa5 <- ddply(newa4, .(Subject), transform, Z1=scale(F1), Z2=scale(F2), DOB=Year-Age)
 
-oldaf <- droplevels(subset(olda5, VClass %in% c('ae','aeh','aeBR')))
-newaf <- droplevels(subset(newa5, VClass %in% c('ae','aeh','aeBR')))
+mel <- function(x) {
+  2595*log(1+(x/700))
+}
+
+olda5$M1=mel(olda5$F1)
+olda5$M2=mel(olda5$F2)
+newa5$M1=mel(newa5$F1)
+newa5$M2=mel(newa5$F2)
+
+olda6 <- ddply(olda5, .(Subject), transform, MZ1=scale(M1), MZ2=scale(M2))
+newa6 <- ddply(newa5, .(Subject), transform, MZ1=scale(M1), MZ2=scale(M2))
+
+oldaf <- droplevels(subset(olda6, VClass %in% c('ae','aeh','aeBR')))
+newaf <- droplevels(subset(newa6, VClass %in% c('ae','aeh','aeBR')))
 
 write.csv(oldaf, "shorta-old.csv", row.names=FALSE, quote=FALSE)
 write.csv(newaf, "shorta-new.csv", row.names=FALSE, quote=FALSE)
