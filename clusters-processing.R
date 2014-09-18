@@ -5,7 +5,7 @@ oldaf <- read.csv("shorta-old.csv")
 
 # make a giant pdf of every PNC speaker's short-a system
 library(ggplot2)
-pdf(file = "PNC-shorta.pdf", width=6, height=5, onefile=TRUE)
+pdf(file = "PNC-shorta-old.pdf", width=6, height=5, onefile=TRUE)
 for (spk in levels(oldaf$Subject)) {
   print(ggplot(data=subset(oldaf, Subject==spk), 
                aes(F2, F1, color=VClass, label=Word))+
@@ -21,7 +21,7 @@ dev.off()
 philasys <- droplevels(subset(oldaf, !Subject %in% c('IHP1-1', 'IHP1-2',
                        'IHP1-4', 'IHP1-5', 'IHP2-1', 'IHP2-11', 'IHP2-12',
                        'IHP2-13', 'IHP2-14', 'IHP2-15', 'IHP2-16', 
-                       'IHP2-17', 'IHP2-19', 'IHP-2-2', 'IHP-2-22', 
+                       'IHP2-17', 'IHP2-19', 'IHP2-2', 'IHP2-22', 
                        'IHP2-24', 'IHP2-25', 'IHP2-26', 'IHP2-3', 
                        'IHP2-30', 'IHP2-35', 'IHP2-38', 'IHP2-39', 
                        'IHP2-4', 'IHP2-40', 'IHP2-42', 'IHP2-44', 
@@ -33,7 +33,7 @@ philasys <- droplevels(subset(oldaf, !Subject %in% c('IHP1-1', 'IHP1-2',
                        'PH84-2-1', 'PH87-1-3', 'PH91-2-19', 'PH91-2-20', 
                        'PH91-2-21','PH91-2-8', 'PH92-2-1', 'PH97-3-2',
                        'PHI-M-1', 'PHI-M-2', 'PHI-M-4', 'PHI-R-1', 
-                       'PHI-R-2', 'PHI-R-4' 'PHI-R-5', 'PHI-R-6', 'PHI-R-7')))
+                       'PHI-R-2', 'PHI-R-4', 'PHI-R-5', 'PHI-R-6', 'PHI-R-7')))
 
 # pull out s-cluster words
 clusters <- droplevels(subset(philasys, Word %in% c("ALABASTER", "ALASKA", 
@@ -140,9 +140,9 @@ clusters <- droplevels(subset(philasys, Word %in% c("ALABASTER", "ALASKA",
 clusters2 <- droplevels(subset(clusters, Manner=="fricative"))
 
 # make a giant pdf of traditional speakers' s-clusters
-pdf(file = "~/Desktop/PNC-sclusters.pdf", width=6, height=5, onefile=TRUE)
+pdf(file = "PNC-sclusters.pdf", width=6, height=5, onefile=TRUE)
 for (spk in levels(clusters2$Subject)) {
-  print(ggplot(data=subset(shorta, Subject==spk), 
+  print(ggplot(data=subset(philasys, Subject==spk), 
                aes(F2, F1, label=Word, color=VClass))+
           geom_text(size=2, alpha=.5)+
           geom_text(data=subset(clusters2, Subject==spk), color='black', size=2)+
@@ -154,12 +154,15 @@ for (spk in levels(clusters2$Subject)) {
 dev.off()
 
 ##### malanobis distances
-# all tense/lax tokens are in oldaf
+# all tense/lax tokens are in philasys
 # cluster tokens are in clusters2
 
+# create data frame with a dummy row because sigh, R
 out <- data.frame(mahal_ae=1.0, mahal_aeh=1.0)
+
+# calculate mahalanobis distances for cluster words
 for (speaker in levels(clusters2$Subject)){
-  data <- subset(oldaf, Subject==speaker)
+  data <- subset(philasys, Subject==speaker)
   words <- subset(clusters2, Subject==speaker, select=c(F1,F2))
   ae_means <- c(mean(data[data$VClass=='ae',]$F1), mean(data[data$VClass=='ae',]$F2))
   aeh_means <- c(mean(data[data$VClass=='aeh',]$F1), mean(data[data$VClass=='aeh',]$F2))
@@ -173,14 +176,19 @@ for (speaker in levels(clusters2$Subject)){
   }
 }
 
+# get rid of that dummy row
 out2 <- out[-1,]
+# add distances to dataframe
 sC.mahal <- cbind(clusters2, out2)
+# calculate which vowel mean each word is closer to
 sC.mahal$closer <- with(sC.mahal, ifelse(mahal_ae < mahal_aeh, "ae", "aeh"))
+# make a table of words by new code
+with(sC.mahal, table(Word, closer))
 
 # giant pdf of new codes and mahalanobis distances
-pdf(file = "~/Desktop/sc-mahal.pdf", width=6, height=5, onefile=TRUE)
+pdf(file = "sc-mahal.pdf", width=6, height=5, onefile=TRUE)
 for (spk in levels(sC.mahal$Subject)) {
-  print(ggplot(data=subset(oldaf, Subject==spk), aes(F2, F1, label=Word))+
+  print(ggplot(data=subset(philasys, Subject==spk), aes(F2, F1, label=Word))+
           geom_text(size=2, alpha=.35)+
           geom_text(data=subset(sC.mahal, Subject==spk), 
                     aes(color=closer, 
