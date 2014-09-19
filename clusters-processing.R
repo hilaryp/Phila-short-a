@@ -153,24 +153,34 @@ for (spk in levels(clusters2$Subject)) {
 }
 dev.off()
 
-##### malanobis distances
+##### malanobis distances #####
 # all tense/lax tokens are in philasys
 # cluster tokens are in clusters2
 
 # create data frame with a dummy row because sigh, R
 out <- data.frame(mahal_ae=1.0, mahal_aeh=1.0)
 
-# calculate mahalanobis distances for cluster words
+# calculate mahalanobis distances for cluster words on a by-speaker basis
 for (speaker in levels(clusters2$Subject)){
   data <- subset(philasys, Subject==speaker)
-  words <- subset(clusters2, Subject==speaker, select=c(F1,F2))
-  ae_means <- c(mean(data[data$VClass=='ae',]$F1), mean(data[data$VClass=='ae',]$F2))
-  aeh_means <- c(mean(data[data$VClass=='aeh',]$F1), mean(data[data$VClass=='aeh',]$F2))
-  icov <- solve(cov(cbind(data$F1, data$F2)))
+  words <- subset(clusters2, Subject==speaker, select=c(MZ1,MZ2))
+  # get means & covariances for the speaker's ae and aeh
+  ae_means <- c(mean(data[data$VClass=='ae',]$MZ1), 
+                mean(data[data$VClass=='ae',]$MZ2))
+  aeh_means <- c(mean(data[data$VClass=='aeh',]$MZ1), 
+                 mean(data[data$VClass=='aeh',]$MZ2))
+  ae_cov <- cov(cbind(data[data$VClass=='ae',]$MZ1, 
+                             data[data$VClass=='ae',]$MZ2))
+  aeh_cov <- cov(cbind(data[data$VClass=='aeh',]$MZ1, 
+                              data[data$VClass=='aeh',]$MZ2))
+  aeh_icov <- ginv(aeh_cov)
+  ae_icov <- ginv(ae_cov)
+  # for each of the speaker's s-cluster words, calculate mahalanobis 
+  # distance, append to output
   for (i in 1:nrow(words)) {
     word <- words[i, ]
-    mahal_ae <- mahalanobis(x=word, center = ae_means, cov=icov, inverted=TRUE)
-    mahal_aeh <- mahalanobis(x=word, center = aeh_means, cov=icov, inverted=TRUE)
+    mahal_ae <- mahalanobis(x=word, center=ae_means, cov=ae_icov, inverted=TRUE)
+    mahal_aeh <- mahalanobis(x=word, center=aeh_means, cov=aeh_icov, inverted=TRUE)
     mahals <- cbind(mahal_ae, mahal_aeh)
     out <- rbind(out, mahals)
   }
@@ -184,6 +194,37 @@ sC.mahal <- cbind(clusters2, out2)
 sC.mahal$closer <- with(sC.mahal, ifelse(mahal_ae < mahal_aeh, "ae", "aeh"))
 # make a table of words by new code
 with(sC.mahal, table(Word, closer))
+
+
+# calculate mahalanobis distances for cluster words on group means
+# get means & covariances for the group's ae and aeh means
+ae_mean <- c(mean(philasys[philasys$VClass=='ae',]$MZ1), 
+              mean(philasys[philasys$VClass=='ae',]$MZ2))
+aeh_mean <- c(mean(philasys[philasys$VClass=='aeh',]$MZ1), 
+               mean(philasys[philasys$VClass=='aeh',]$MZ2))
+ae_icov <- solve(cov(cbind(philasys[philasys$VClass=='ae',]$MZ1, 
+                           philasys[philasys$VClass=='ae',]$MZ2)))
+aeh_icov <- solve(cov(cbind(philasys[philasys$VClass=='aeh',]$MZ1, 
+                           philasys[philasys$VClass=='aeh',]$MZ2)))
+words <- cbind(clusters2$MZ1, clusters2$MZ2))
+# for each s-cluster word, calculate mahalanobis distance, append to output
+for (i in 1:nrow(words)) {
+    word <- words[i, ]
+    mahal_ae <- mahalanobis(x=word, center=ae_mean, cov=ae_icov, inverted=TRUE)
+    mahal_aeh <- mahalanobis(x=word, center=aeh_mean, cov=aeh_icov, inverted=TRUE)
+    mahals <- cbind(mahal_ae, mahal_aeh)
+    out <- rbind(out, mahals)
+  }
+}
+
+# get rid of that dummy row
+out2 <- out[-1,]
+# add distances to dataframe
+sC.mahal2 <- cbind(clusters2, out2)
+# calculate which vowel mean each word is closer to
+sC.mahal2$closer <- with(sC.mahal, ifelse(mahal_ae < mahal_aeh, "ae", "aeh"))
+# make a table of words by new code
+with(sC.mahal2, table(Word, closer))
 
 # giant pdf of new codes and mahalanobis distances
 pdf(file = "sc-mahal.pdf", width=6, height=5, onefile=TRUE)
