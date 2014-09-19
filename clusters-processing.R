@@ -188,11 +188,11 @@ for (speaker in levels(clusters2$Subject)) {
   ae.d <- data[data$VClass=="ae", ]
   ae <- cbind(ae.d$MZ1, ae.d$MZ2)
   ae.mu <- colMeans(ae)
-  ae.icov <- solve(cov(ae))
+  ae.icov <- inv(cov(ae))
   aeh.d <- data[data$VClass=="aeh", ]
   aeh <- cbind(aeh.d$MZ1, aeh.d$MZ2)
   aeh.mu <- colMeans(aeh)
-  aeh.icov <- solve(cov(aeh))
+  aeh.icov <- inv(cov(aeh))
   # for each of the speaker's s-cluster words, calculate mahalanobis 
   # distance, append to output
   for (i in 1:nrow(words)) {
@@ -217,14 +217,15 @@ with(sC.mahal, table(Word, closer))
 
 # calculate mahalanobis distances for cluster words on group means
 # get means & covariances for the group's ae and aeh means
+out <- data.frame(mahal.ae=1.0, mahal.aeh=1.0)
 ae.d <- philasys[philasys$VClass=="ae", ]
 ae <- cbind(ae.d$MZ1, ae.d$MZ2, row.names=NULL)
 ae.mu <- colMeans(ae)
-ae.icov <- solve(cov(ae))
+ae.icov <- inv(cov(ae))
 aeh.d <- philasys[philasys$VClass=="aeh", ]
 aeh <- cbind(aeh.d$MZ1, aeh.d$MZ2)
 aeh.mu <- colMeans(aeh)
-ae.icov <- solve(cov(aeh))
+ae.icov <- inv(cov(aeh))
 words <- cbind(clusters2$MZ1, clusters2$MZ2)
 # for each s-cluster word, calculate mahalanobis distance, append to output
 for (i in 1:nrow(words)) {
@@ -242,7 +243,7 @@ out2 <- out[-1,]
 # add distances to dataframe
 sC.mahal2 <- cbind(clusters2, out2, row.names=NULL)
 # calculate which vowel mean each word is closer to
-sC.mahal2$closer <- as.factor(with(sC.mahal, ifelse(mahal.ae < mahal.aeh, "ae", "aeh")))
+sC.mahal2$closer <- as.factor(with(sC.mahal2, ifelse(mahal.ae < mahal.aeh, "ae", "aeh")))
 # make a table of words by new code
 with(sC.mahal2, table(Word, closer))
 
@@ -255,8 +256,8 @@ if (MAKE.PDF) {
                      geom_text(size=2, alpha=.35) +
                      geom_text(data=subset(sC.mahal, Subject==spk), 
                      aes(color=closer, 
-                         label=paste0(Word, "\n", round(mahal_aeh), ", ", 
-                         round(mahal_ae))), vjust=.8, size=2) +
+                         label=paste0(Word, "\n", round(mahal.aeh), ", ", 
+                         round(mahal.ae))), vjust=.8, size=2) +
                      scale_x_reverse() +
                      scale_y_reverse() +
                      labs(title=spk) +
