@@ -1,21 +1,32 @@
+#!/usr/bin/env Rscript
+
 # First pass analysis of old coding to reassign sC clusters
 
-setwd('~/Desktop/Phila-short-a/')
+#setwd('~/Desktop/Phila-short-a/')
 oldaf <- read.csv("shorta-old.csv")
 
-# make a giant pdf of every PNC speaker's short-a system
+MAKE.PDF <- FALSE
+
+library(MASS)
 library(ggplot2)
-pdf(file = "PNC-shorta-old.pdf", width=6, height=5, onefile=TRUE)
-for (spk in levels(oldaf$Subject)) {
-  print(ggplot(data=subset(oldaf, Subject==spk), 
-               aes(F2, F1, color=VClass, label=Word))+
-          geom_text(size=2)+
-          scale_x_reverse()+
-          scale_y_reverse()+
-          labs(title=spk)+
-          theme_bw())
+
+# how we invert things
+inv <- function(X) solve(X)
+
+# make a giant pdf of every PNC speaker's short-a system
+if (MAKE.PDF) {
+    pdf(file = "PNC-shorta-old.pdf", width=6, height=5, onefile=TRUE)
+    for (spk in levels(oldaf$Subject)) {
+    print(ggplot(data=subset(oldaf, Subject==spk), 
+                 aes(F2, F1, color=VClass, label=Word)) +
+                 geom_text(size=2) +
+                 scale_x_reverse() +
+                 scale_y_reverse() +
+                 labs(title=spk) +
+                 theme_bw())
+    }
+    dev.off()
 }
-dev.off()
 
 # remove the speakers who clearly don't have the traditional system
 philasys <- droplevels(subset(oldaf, !Subject %in% c('IHP1-1', 'IHP1-2',
@@ -33,7 +44,14 @@ philasys <- droplevels(subset(oldaf, !Subject %in% c('IHP1-1', 'IHP1-2',
                        'PH84-2-1', 'PH87-1-3', 'PH91-2-19', 'PH91-2-20', 
                        'PH91-2-21','PH91-2-8', 'PH92-2-1', 'PH97-3-2',
                        'PHI-M-1', 'PHI-M-2', 'PHI-M-4', 'PHI-R-1', 
-                       'PHI-R-2', 'PHI-R-4', 'PHI-R-5', 'PHI-R-6', 'PHI-R-7')))
+                       'PHI-R-2', 'PHI-R-4', 'PHI-R-5', 'PHI-R-6', 
+                       'PHI-R-7',
+                       # This last group has the Philly system, we thought,
+                       # but not enough tokens to estimate stable means
+                       # for the per-speaker Mahalanobis distance stuff.
+                       # If we end up NOT using the per-speaker measures,
+                       # these folks should probably be added back in. --KG
+                       'PH79-3-8', 'PH79-4-5', 'PH85-3-8', 'PH91-2-3')))
 
 # pull out s-cluster words
 clusters <- droplevels(subset(philasys, Word %in% c("ALABASTER", "ALASKA", 
@@ -140,48 +158,50 @@ clusters <- droplevels(subset(philasys, Word %in% c("ALABASTER", "ALASKA",
 clusters2 <- droplevels(subset(clusters, Manner=="fricative"))
 
 # make a giant pdf of traditional speakers' s-clusters
-pdf(file = "PNC-sclusters.pdf", width=6, height=5, onefile=TRUE)
-for (spk in levels(clusters2$Subject)) {
-  print(ggplot(data=subset(philasys, Subject==spk), 
-               aes(F2, F1, label=Word, color=VClass))+
-          geom_text(size=2, alpha=.5)+
-          geom_text(data=subset(clusters2, Subject==spk), color='black', size=2)+
-          scale_x_reverse()+
-          scale_y_reverse()+
-          labs(title=spk)+
-          theme_bw())
+if (MAKE.PDF) {
+    pdf(file = "PNC-sclusters.pdf", width=6, height=5, onefile=TRUE)
+    for (spk in levels(clusters2$Subject)) {
+    print(ggplot(data=subset(philasys, Subject==spk), 
+                 aes(F2, F1, label=Word, color=VClass)) +
+                 geom_text(size=2, alpha=.5) +
+                 geom_text(data=subset(clusters2, Subject==spk), color='black', size=2) +
+                 scale_x_reverse() +
+                 scale_y_reverse() +
+                 labs(title=spk) +
+                 theme_bw())
+    }
+    dev.off()
 }
-dev.off()
 
 ##### malanobis distances #####
 # all tense/lax tokens are in philasys
 # cluster tokens are in clusters2
 
 # create data frame with a dummy row because sigh, R
-out <- data.frame(mahal_ae=1.0, mahal_aeh=1.0)
+out <- data.frame(mahal.ae=1.0, mahal.aeh=1.0)
 
 # calculate mahalanobis distances for cluster words on a by-speaker basis
-for (speaker in levels(clusters2$Subject)){
+for (speaker in levels(clusters2$Subject)) {
   data <- subset(philasys, Subject==speaker)
   words <- subset(clusters2, Subject==speaker, select=c(MZ1,MZ2))
   # get means & covariances for the speaker's ae and aeh
-  ae_means <- c(mean(data[data$VClass=='ae',]$MZ1), 
-                mean(data[data$VClass=='ae',]$MZ2))
-  aeh_means <- c(mean(data[data$VClass=='aeh',]$MZ1), 
-                 mean(data[data$VClass=='aeh',]$MZ2))
-  ae_cov <- cov(cbind(data[data$VClass=='ae',]$MZ1, 
-                             data[data$VClass=='ae',]$MZ2))
-  aeh_cov <- cov(cbind(data[data$VClass=='aeh',]$MZ1, 
-                              data[data$VClass=='aeh',]$MZ2))
-  aeh_icov <- ginv(aeh_cov)
-  ae_icov <- ginv(ae_cov)
+  ae.d <- data[data$VClass=="ae", ]
+  ae <- cbind(ae.d$MZ1, ae.d$MZ2)
+  ae.mu <- colMeans(ae)
+  ae.icov <- solve(cov(ae))
+  aeh.d <- data[data$VClass=="aeh", ]
+  aeh <- cbind(aeh.d$MZ1, aeh.d$MZ2)
+  aeh.mu <- colMeans(aeh)
+  aeh.icov <- solve(cov(aeh))
   # for each of the speaker's s-cluster words, calculate mahalanobis 
   # distance, append to output
   for (i in 1:nrow(words)) {
     word <- words[i, ]
-    mahal_ae <- mahalanobis(x=word, center=ae_means, cov=ae_icov, inverted=TRUE)
-    mahal_aeh <- mahalanobis(x=word, center=aeh_means, cov=aeh_icov, inverted=TRUE)
-    mahals <- cbind(mahal_ae, mahal_aeh)
+    mahal.ae <- mahalanobis(x=word, center=ae.mu, cov=ae.icov, 
+                            inverted=TRUE)
+    mahal.aeh <- mahalanobis(x=word, center=aeh.mu, cov=aeh.icov, 
+                             inverted=TRUE)
+    mahals <- cbind(mahal.ae, mahal.aeh)
     out <- rbind(out, mahals)
   }
 }
@@ -189,56 +209,58 @@ for (speaker in levels(clusters2$Subject)){
 # get rid of that dummy row
 out2 <- out[-1,]
 # add distances to dataframe
-sC.mahal <- cbind(clusters2, out2)
+sC.mahal <- cbind(clusters2, out2, row.names=NULL)
 # calculate which vowel mean each word is closer to
-sC.mahal$closer <- with(sC.mahal, ifelse(mahal_ae < mahal_aeh, "ae", "aeh"))
+sC.mahal$closer <- as.factor(with(sC.mahal, ifelse(mahal.ae < mahal.aeh, "ae", "aeh")))
 # make a table of words by new code
 with(sC.mahal, table(Word, closer))
 
-
 # calculate mahalanobis distances for cluster words on group means
 # get means & covariances for the group's ae and aeh means
-ae_mean <- c(mean(philasys[philasys$VClass=='ae',]$MZ1), 
-              mean(philasys[philasys$VClass=='ae',]$MZ2))
-aeh_mean <- c(mean(philasys[philasys$VClass=='aeh',]$MZ1), 
-               mean(philasys[philasys$VClass=='aeh',]$MZ2))
-ae_icov <- solve(cov(cbind(philasys[philasys$VClass=='ae',]$MZ1, 
-                           philasys[philasys$VClass=='ae',]$MZ2)))
-aeh_icov <- solve(cov(cbind(philasys[philasys$VClass=='aeh',]$MZ1, 
-                           philasys[philasys$VClass=='aeh',]$MZ2)))
-words <- cbind(clusters2$MZ1, clusters2$MZ2))
+ae.d <- philasys[philasys$VClass=="ae", ]
+ae <- cbind(ae.d$MZ1, ae.d$MZ2, row.names=NULL)
+ae.mu <- colMeans(ae)
+ae.icov <- solve(cov(ae))
+aeh.d <- philasys[philasys$VClass=="aeh", ]
+aeh <- cbind(aeh.d$MZ1, aeh.d$MZ2)
+aeh.mu <- colMeans(aeh)
+ae.icov <- solve(cov(aeh))
+words <- cbind(clusters2$MZ1, clusters2$MZ2)
 # for each s-cluster word, calculate mahalanobis distance, append to output
 for (i in 1:nrow(words)) {
     word <- words[i, ]
-    mahal_ae <- mahalanobis(x=word, center=ae_mean, cov=ae_icov, inverted=TRUE)
-    mahal_aeh <- mahalanobis(x=word, center=aeh_mean, cov=aeh_icov, inverted=TRUE)
-    mahals <- cbind(mahal_ae, mahal_aeh)
+    mahal.ae <- mahalanobis(x=word, center=ae.mu, cov=ae.icov, 
+                            inverted=TRUE)
+    mahal.aeh <- mahalanobis(x=word, center=aeh.mu, cov=aeh.icov, 
+                             inverted=TRUE)
+    mahals <- cbind(mahal.ae, mahal.aeh)
     out <- rbind(out, mahals)
-  }
 }
 
 # get rid of that dummy row
 out2 <- out[-1,]
 # add distances to dataframe
-sC.mahal2 <- cbind(clusters2, out2)
+sC.mahal2 <- cbind(clusters2, out2, row.names=NULL)
 # calculate which vowel mean each word is closer to
-sC.mahal2$closer <- with(sC.mahal, ifelse(mahal_ae < mahal_aeh, "ae", "aeh"))
+sC.mahal2$closer <- as.factor(with(sC.mahal, ifelse(mahal.ae < mahal.aeh, "ae", "aeh")))
 # make a table of words by new code
 with(sC.mahal2, table(Word, closer))
 
 # giant pdf of new codes and mahalanobis distances
-pdf(file = "sc-mahal.pdf", width=6, height=5, onefile=TRUE)
-for (spk in levels(sC.mahal$Subject)) {
-  print(ggplot(data=subset(philasys, Subject==spk), aes(F2, F1, label=Word))+
-          geom_text(size=2, alpha=.35)+
-          geom_text(data=subset(sC.mahal, Subject==spk), 
-                    aes(color=closer, 
-                        label=paste0(Word, "\n", round(mahal_aeh), ", ", 
-                                     round(mahal_ae))), 
-                    vjust=.8, size=2)+
-          scale_x_reverse()+
-          scale_y_reverse()+
-          labs(title=spk)+
-          theme_bw())
+if (MAKE.PDF) {
+    pdf(file = "sc-mahal.pdf", width=6, height=5, onefile=TRUE)
+    for (spk in levels(sC.mahal$Subject)) {
+        print(ggplot(data=subset(philasys, Subject==spk), 
+                     aes(F2, F1, label=Word)) +
+                     geom_text(size=2, alpha=.35) +
+                     geom_text(data=subset(sC.mahal, Subject==spk), 
+                     aes(color=closer, 
+                         label=paste0(Word, "\n", round(mahal_aeh), ", ", 
+                         round(mahal_ae))), vjust=.8, size=2) +
+                     scale_x_reverse() +
+                     scale_y_reverse() +
+                     labs(title=spk) +
+                     theme_bw())
+    }
+    dev.off()
 }
-dev.off()
