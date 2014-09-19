@@ -258,6 +258,7 @@ if (MAKE.PDF) {
                      aes(color=closer, 
                          label=paste0(Word, "\n", round(mahal.aeh), ", ", 
                          round(mahal.ae))), vjust=.8, size=2) +
+                     scale_color_manual(values=c('aeh'='red', 'ae'='blue'))+
                      scale_x_reverse() +
                      scale_y_reverse() +
                      labs(title=spk) +
