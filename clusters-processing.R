@@ -217,42 +217,42 @@ with(sC.mahal, table(Word, closer))
 
 # calculate mahalanobis distances for cluster words on group means
 # get means & covariances for the group's ae and aeh means
-out <- data.frame(mahal.ae=1.0, mahal.aeh=1.0)
-ae.d <- philasys[philasys$VClass=="ae", ]
-ae <- cbind(ae.d$MZ1, ae.d$MZ2, row.names=NULL)
-ae.mu <- colMeans(ae)
-ae.icov <- inv(cov(ae))
-aeh.d <- philasys[philasys$VClass=="aeh", ]
-aeh <- cbind(aeh.d$MZ1, aeh.d$MZ2)
-aeh.mu <- colMeans(aeh)
-ae.icov <- inv(cov(aeh))
-words <- cbind(clusters2$MZ1, clusters2$MZ2)
+#out <- data.frame(mahal.ae=1.0, mahal.aeh=1.0)
+#ae.d <- philasys[philasys$VClass=="ae", ]
+#ae <- cbind(ae.d$MZ1, ae.d$MZ2, row.names=NULL)
+#ae.mu <- colMeans(ae)
+#ae.icov <- inv(cov(ae))
+#aeh.d <- philasys[philasys$VClass=="aeh", ]
+#aeh <- cbind(aeh.d$MZ1, aeh.d$MZ2)
+#aeh.mu <- colMeans(aeh)
+#ae.icov <- inv(cov(aeh))
+#words <- cbind(clusters2$MZ1, clusters2$MZ2)
 # for each s-cluster word, calculate mahalanobis distance, append to output
-for (i in 1:nrow(words)) {
-    word <- words[i, ]
-    mahal.ae <- mahalanobis(x=word, center=ae.mu, cov=ae.icov, 
-                            inverted=TRUE)
-    mahal.aeh <- mahalanobis(x=word, center=aeh.mu, cov=aeh.icov, 
-                             inverted=TRUE)
-    mahals <- cbind(mahal.ae, mahal.aeh)
-    out <- rbind(out, mahals)
-}
+#for (i in 1:nrow(words)) {
+#    word <- words[i, ]
+#    mahal.ae <- mahalanobis(x=word, center=ae.mu, cov=ae.icov, 
+#                            inverted=TRUE)
+#    mahal.aeh <- mahalanobis(x=word, center=aeh.mu, cov=aeh.icov, 
+#                             inverted=TRUE)
+#    mahals <- cbind(mahal.ae, mahal.aeh)
+#    out <- rbind(out, mahals)
+#}
 
 # get rid of that dummy row
-out2 <- out[-1,]
+#out2 <- out[-1,]
 # add distances to dataframe
-sC.mahal2 <- cbind(clusters2, out2, row.names=NULL)
+#sC.mahal2 <- cbind(clusters2, out2, row.names=NULL)
 # calculate which vowel mean each word is closer to
-sC.mahal2$closer <- as.factor(with(sC.mahal2, ifelse(mahal.ae < mahal.aeh, "ae", "aeh")))
+#sC.mahal2$closer <- as.factor(with(sC.mahal2, ifelse(mahal.ae < mahal.aeh, "ae", "aeh")))
 # make a table of words by new code
-with(sC.mahal2, table(Word, closer))
+#with(sC.mahal2, table(Word, closer))
 
 # giant pdf of new codes and mahalanobis distances
 if (MAKE.PDF) {
     pdf(file = "sc-mahal.pdf", width=6, height=5, onefile=TRUE)
     for (spk in levels(sC.mahal$Subject)) {
         print(ggplot(data=subset(philasys, Subject==spk), 
-                     aes(F2, F1, label=Word)) +
+                     aes(MZ2, MZ1, label=Word)) +
                      geom_text(size=2, alpha=.35) +
                      geom_text(data=subset(sC.mahal, Subject==spk), 
                      aes(color=closer, 
