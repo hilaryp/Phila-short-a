@@ -1,19 +1,22 @@
 #!/usr/bin/env Rscript
 
-# First pass analysis of old coding to reassign sC clusters
+# Analysis Step 1: re-code the sC clusters
+# 1. Identify & subset speakers with the traditional short-a system.
+# 2. Pull out their sC cluster words.
+# 3. Calculate Mahalanobis distance between each cluster word & its
+#    speaker's ae and aeh means.
+# 4. Recode each word as 'ae' or 'aeh' by which distance is smaller.
+# 5. Tabulate new code by word & identify patterns.
+# 6. Update shorta.py exception lists & re-run corpus.
 
-#setwd('~/Desktop/Phila-short-a/')
-oldaf <- read.csv("shorta-old.csv")
-
-MAKE.PDF <- FALSE
-
-library(MASS)
 library(ggplot2)
-
+# setwd('~/Desktop/Phila-short-a/')
+oldaf <- read.csv("shorta-old.csv")
+MAKE.PDF <- FALSE
 # how we invert things
 inv <- function(X) solve(X)
 
-# make a giant pdf of every PNC speaker's short-a system
+# make a giant pdf of every speaker's short-a system to identify tradish
 if (MAKE.PDF) {
     pdf(file = "PNC-shorta-old.pdf", width=6, height=5, onefile=TRUE)
     for (spk in levels(oldaf$Subject)) {
@@ -47,11 +50,13 @@ philasys <- droplevels(subset(oldaf, !Subject %in% c('IHP1-1', 'IHP1-2',
                        'PHI-R-2', 'PHI-R-4', 'PHI-R-5', 'PHI-R-6', 
                        'PHI-R-7',
                        # This last group has the Philly system, we thought,
-                       # but not enough tokens to estimate stable means
+                       # but not enough tokens (5) to estimate stable means
                        # for the per-speaker Mahalanobis distance stuff.
                        # If we end up NOT using the per-speaker measures,
                        # these folks should probably be added back in. --KG
-                       'PH79-3-8', 'PH79-4-5', 'PH85-3-8', 'PH91-2-3')))
+                       'PH79-3-8', 'PH79-4-5', 'PH85-3-8', 'PH91-2-3',
+                       "PH10-2-10", "PH10-2-11", "PH80-2-8", "PH84-2-10",
+                       "PH86-3-3", "PH90-2-2")))
 
 # pull out s-cluster words
 clusters <- droplevels(subset(philasys, Word %in% c("ALABASTER", "ALASKA", 
@@ -70,87 +75,85 @@ clusters <- droplevels(subset(philasys, Word %in% c("ALABASTER", "ALASKA",
                        "ASTRONAUTICS", "ASTRONAUTS", "ASTRONAUTS'", 
                        "ASTRONOMICAL", "ASTRONOMICALLY", "ASTROPHYSICIST", 
                        "ASTROPHYSICS", "ASTROS", "ASTROTECH", "ASTROTURF", 
-                       "BASKERVILLE", "BASKET", "BASKETBALL", 
-                       "BASKETBALL'S", "BASKETBALLS", "BASKETMAKER", 
-                       "BASKETMAKING", "BASKETRY", "BASKETS", "BASKING", 
-                       "BASTARD", "BASTARDS", "BASTILLE", 
-                       "BLASTED", "BLASTER", "BLASTIN'", "BLASTING", 
-                       "BLASTOFF", "BOMBASTIC", "BREADBASKET", 
-                       "BROADCASTER", "BROADCASTER'S", "BROADCASTERS", 
-                       "BROADCASTERS'", "BROADCASTING", "BROADCASTING'S", 
-                       "CANASTA", "CARDIOVASCULAR", "CASCADE", 
-                       "CASCADE'S", "CASCADED", "CASCADES", "CASCADES'", 
-                       "CASCADING", "CASKET", "CASKETS", "CASPAR", 
-                       "CASPER", "CASPERS", "CASPIAN", "CASTAWAY", "CASTAWAYS", 
-                       "CASTER", "CASTERS", "CASTIGATE", "CASTIGATED", 
-                       "CASTIGATING", "CASTILLE", "CASTIN'", "CASTING", 
-                       "CASTINGS", "CASTOFF", "CASTOFFS", "CASTOR", "CASTRATE", 
-                       "CASTRATED", "CASTRATES", "CASTRATING", "CASTRATION", 
-                       "CASTRATIONS", "CASTRO", "CASTRO'S", "CASTS", 
-                       "CATASTROPHE", "CATASTROPHES", "CHASTISE", "CHASTISED", 
-                       "CHASTISES", "CHASTISING", "CHASTITY", "CHLOROPLASTS", 
-                       "COMCAST'S", "CONCERTMASTER", "CONTRASTED", 
-                       "CONTRASTING", "DIASPORA", "DIASTOLE", 
-                       "DIASTROPHISM", "DISASTER", "DISASTERS", "DISASTROUS", 
-                       "DISASTROUSLY", "DRASTIC", "DRASTICALLY", "DYNASTIC", 
-                       "ECCLESIASTIC", "ECCLESIASTICAL", "ELASTIC", "ELASTICITY", 
+                       "BASKERVILLE", "BASKET", "BASKETBALL", "BASKETBALL'S", 
+                       "BASKETBALLS", "BASKETMAKER", "BASKETMAKING", 
+                       "BASKETRY", "BASKETS", "BASKING", "BASTARD", 
+                       "BASTARDS", "BASTILLE", "BLASTED", "BLASTER", 
+                       "BLASTIN'", "BLASTING", "BLASTOFF", "BOMBASTIC", 
+                       "BREADBASKET", "BROADCASTER", "BROADCASTER'S", 
+                       "BROADCASTERS", "BROADCASTERS'", "BROADCASTING", 
+                       "BROADCASTING'S", "CANASTA", "CARDIOVASCULAR", 
+                       "CASCADE", "CASCADE'S", "CASCADED", "CASCADES", 
+                       "CASCADES'", "CASCADING", "CASKET", "CASKETS", 
+                       "CASPAR", "CASPER", "CASPERS", "CASPIAN", "CASTAWAY", 
+                       "CASTAWAYS", "CASTER", "CASTERS", "CASTIGATE", 
+                       "CASTIGATED", "CASTIGATING", "CASTILLE", "CASTIN'", 
+                       "CASTING", "CASTINGS", "CASTOFF", "CASTOFFS", 
+                       "CASTOR", "CASTRATE", "CASTRATED", "CASTRATES", 
+                       "CASTRATING", "CASTRATION", "CASTRATIONS", "CASTRO", 
+                       "CASTRO'S", "CASTS", "CATASTROPHE", "CATASTROPHES", 
+                       "CHASTISE", "CHASTISED", "CHASTISES", "CHASTISING", 
+                       "CHASTITY", "CHLOROPLASTS", "COMCAST'S", 
+                       "CONCERTMASTER", "CONTRASTED", "CONTRASTING", 
+                       "DIASPORA", "DIASTOLE", "DIASTROPHISM", "DISASTER", 
+                       "DISASTERS", "DISASTROUS", "DISASTROUSLY", "DRASTIC", 
+                       "DRASTICALLY", "DYNASTIC", "ECCLESIASTIC", 
+                       "ECCLESIASTICAL", "ELASTIC", "ELASTICITY", 
                        "ELASTOMER", "ELASTOMERS", "EMASCULATE", "EMASCULATED", 
                        "ENTHUSIASTIC", "ENTHUSIASTICALLY", "ENTHUSIASTS", 
                        "EVERLASTING", "EVERLASTINGS", "EXASPERATE", 
                        "EXASPERATED", "EXASPERATING", "EXASPERATION", 
-                       "FANTASTIC", "FANTASTICALLY", "FASTED", 
-                       "FASTER", "FASTEST", "FASTIDIOUS", "FASTING", 
-                       "FIASCO", "FIASCO'S", "FIASCOS", 
-                       "FIGHTMASTER", "FLABBERGASTED", "FLAMEMASTER", 
-                       "FORECASTED", "FORECASTER", "FORECASTERS", "FORECASTING", 
-                       "GASKELL","GASKET", "GASKETS", "GASPED", "GASPER", 
-                       "GASPIN'", "GASPING", "GASTRIC", "GASTRITIS", 
-                       "GASTROINTESTINAL", "GASTRONOMY", "GASTROSCOPE", 
-                       "GASTROVASCULAR", "GASTRULATE", "GASTRULATION", 
-                       "GHASTLINESS", "GRANDMASTER", "GRASPING", "GYMNASTIC", 
-                       "GYMNASTICS", "HEADMASTER", "ICONOCLASTIC", 
-                       "INELASTIC", "INTERSCHOLASTIC", "JASPER", "JASPER'S", 
-                       "JASPERS", "JEWELMASTER", "JEWELMASTERS", "KASPAR", 
-                       "KASPER", "LAMBASTED", "LANCASTER", 
-                       "LANCASTRIAN", "LASTED", "LASTER", "LASTEST", 
-                       "LASTING", "LASTINGER",
-                       "MADAGASCAR", "MASCARA", "MASCOT", 
-                       "MASCOTS", "MASCULINE", "MASCULINITY",
-                       "MASKER", "MASKIN'", "MASKING", "MASQUERADE", 
-                       "MASQUERADING", "MASTECTOMIES", "MASTECTOMY", "MASTED", 
-                       "MASTER", "MASTER'S", "MASTERCARD", "MASTERCARD'S", 
+                       "FANTASTIC", "FANTASTICALLY", "FASTED", "FASTER", 
+                       "FASTEST", "FASTIDIOUS", "FASTING", "FIASCO", 
+                       "FIASCO'S", "FIASCOS", "FIGHTMASTER", "FLABBERGASTED",
+                       "FLAMEMASTER", "FORECASTED", "FORECASTER", 
+                       "FORECASTERS", "FORECASTING", "GASKELL", "GASKET", 
+                       "GASKETS", "GASPED", "GASPER", "GASPIN'", "GASPING", 
+                       "GASTRIC", "GASTRITIS", "GASTROINTESTINAL", 
+                       "GASTRONOMY", "GASTROSCOPE", "GASTROVASCULAR", 
+                       "GASTRULATE", "GASTRULATION", "GHASTLINESS", 
+                       "GRANDMASTER", "GRASPING", "GYMNASTIC", "GYMNASTICS",
+                       "HEADMASTER", "ICONOCLASTIC", "INELASTIC", 
+                       "INTERSCHOLASTIC", "JASPER", "JASPER'S", "JASPERS", 
+                       "JEWELMASTER", "JEWELMASTERS", "KASPAR", "KASPER", 
+                       "LAMBASTED", "LANCASTER", "LANCASTRIAN", "LASTED", 
+                       "LASTER", "LASTEST", "LASTING", "LASTINGER",
+                       "MADAGASCAR", "MASCARA", "MASCOT", "MASCOTS", 
+                       "MASCULINE", "MASCULINITY", "MASKER", "MASKIN'", 
+                       "MASKING", "MASQUERADE", "MASQUERADING", 
+                       "MASTECTOMIES", "MASTECTOMY", "MASTED", "MASTER", 
+                       "MASTER'S", "MASTERCARD", "MASTERCARD'S", 
                        "MASTERCARDS", "MASTERED", "MASTERFUL", "MASTERFULLY", 
                        "MASTERING", "MASTERLY", "MASTERMAN", "MASTERMIND", 
                        "MASTERMINDED", "MASTERMINDING", "MASTERMINDS", 
                        "MASTERPIECE", "MASTERPIECES", "MASTERS", "MASTERS'", 
                        "MASTERWORK", "MASTERWORKS", "MASTERY", "MASTHEAD", 
-                       "MASTIFF", "MASTODON", "MASTURBATE", 
-                       "MASTURBATED", "MASTURBATES", "MASTURBATING", 
-                       "MASTURBATION", "METASTASIZE", "METASTASIZED", "MONASTIC", 
+                       "MASTIFF", "MASTODON", "MASTURBATE", "MASTURBATED", 
+                       "MASTURBATES", "MASTURBATING", "MASTURBATION", 
+                       "METASTASIZE", "METASTASIZED", "MONASTIC", 
                        "MONASTICISM", "MULTITASKING", "NASCAR", "NASTIER", 
-                       "NASTIEST", "NASTINESS", "NASTY", "NEBRASKA", "NEBRASKA'S", 
-                       "NEBRASKAN", "NEBRASKANS", "NEWSCASTER", "NEWSCASTERS", 
-                       "NEWSCASTS", "ONOMASTIC", "ONOMASTICS", 
-                       "OUTLASTED", "PASTEL", "PASTELS", 
-                       "PASTICHE", "PASTIME", "PASTIMES", "PASTOR", "PASTOR'S", 
+                       "NASTIEST", "NASTINESS", "NASTY", "NEBRASKA", 
+                       "NEBRASKA'S", "NEBRASKAN", "NEBRASKANS", "NEWSCASTER", 
+                       "NEWSCASTERS", "NEWSCASTS", "ONOMASTIC", "ONOMASTICS", 
+                       "OUTLASTED", "PASTEL", "PASTELS", "PASTICHE", 
+                       "PASTIME", "PASTIMES", "PASTOR", "PASTOR'S", 
                        "PASTORAL", "PASTORALISM", "PASTORS", "PILASTER", 
                        "PILASTERS", "PLASTER", "PLASTERBOARD", "PLASTERED", 
                        "PLASTERER", "PLASTERING", "PLASTERS", "PLASTERWORK", 
                        "PLASTIC", "PLASTICINE", "PLASTICIZER", "PLASTICS", 
                        "POSTMASTER", "POSTMASTERS", "PROCRASTINATE", 
                        "PROCRASTINATING", "PROCRASTINATION", "PUZZLEMASTER", 
-                       "QUARTERMASTER", "RASCAL", "RASCALS",  
-                       "RASPY", "RASTER", "RECASTING", "RINGMASTER", "ROADMASTER", 
-                       "SANDBLASTED", "SARCASTIC", "SARCASTICALLY", "SCHOLASTIC", 
-                       "SCHOOLMASTER", "SCOUTMASTER", "SERVICEMASTER", 
-                       "SPORTSCASTER", "SPORTSCASTERS", "STAINMASTER", 
-                       "STRATOCASTER", "TABASCO", 
-                       "TASKER", "TASKING", "TASKMASTER", 
-                       "THERMOPLASTIC", "THERMOPLASTICS", 
-                       "TICKETMASTER", "TICKETMASTER'S", "TOASTMASTER", 
-                       "TYPECASTING", "UNENTHUSIASTIC", "VASCULAR", 
-                       "WASTEBASKET", "WASTEBASKETS", 
-                       "WAYCASTER", "WEBMASTER", "PASTURE", "PASTURES", "PASTEURIZE",
+                       "QUARTERMASTER", "RASCAL", "RASCALS", "RASPY", 
+                       "RASTER", "RECASTING", "RINGMASTER", "ROADMASTER", 
+                       "SANDBLASTED", "SARCASTIC", "SARCASTICALLY", 
+                       "SCHOLASTIC", "SCHOOLMASTER", "SCOUTMASTER", 
+                       "SERVICEMASTER", "SPORTSCASTER", "SPORTSCASTERS", 
+                       "STAINMASTER", "STRATOCASTER", "TABASCO", "TASKER", 
+                       "TASKING", "TASKMASTER", "THERMOPLASTIC", 
+                       "THERMOPLASTICS","TICKETMASTER", "TICKETMASTER'S", 
+                       "TOASTMASTER", "TYPECASTING", "UNENTHUSIASTIC", 
+                       "VASCULAR", "WASTEBASKET", "WASTEBASKETS", "WAYCASTER", 
+                       "WEBMASTER", "PASTURE", "PASTURES", "PASTEURIZE",
                        "PASTEURIZED", "PASTEURIZATION", "BASTION"
 )))
 
@@ -164,7 +167,8 @@ if (MAKE.PDF) {
     print(ggplot(data=subset(philasys, Subject==spk), 
                  aes(F2, F1, label=Word, color=VClass)) +
                  geom_text(size=2, alpha=.5) +
-                 geom_text(data=subset(clusters2, Subject==spk), color='black', size=2) +
+                 geom_text(data=subset(clusters2, Subject==spk), 
+                           color='black', size=2) +
                  scale_x_reverse() +
                  scale_y_reverse() +
                  labs(title=spk) +
@@ -173,7 +177,7 @@ if (MAKE.PDF) {
     dev.off()
 }
 
-##### malanobis distances #####
+# Malanobis distances
 # all tense/lax tokens are in philasys
 # cluster tokens are in clusters2
 
@@ -181,6 +185,7 @@ if (MAKE.PDF) {
 out <- data.frame(mahal.ae=1.0, mahal.aeh=1.0)
 
 # calculate mahalanobis distances for cluster words on a by-speaker basis
+# un-normalized gives same result as normalized
 for (speaker in levels(clusters2$Subject)) {
   data <- subset(philasys, Subject==speaker)
   words <- subset(clusters2, Subject==speaker, select=c(MZ1,MZ2))
@@ -208,12 +213,13 @@ for (speaker in levels(clusters2$Subject)) {
 
 # get rid of that dummy row
 out2 <- out[-1,]
-# add distances to dataframe
+# new dataframe with mahal distances
 sC.mahal <- cbind(clusters2, out2, row.names=NULL)
 # calculate which vowel mean each word is closer to
 sC.mahal$closer <- as.factor(with(sC.mahal, ifelse(mahal.ae < mahal.aeh, "ae", "aeh")))
 # make a table of words by new code
 with(sC.mahal, table(Word, closer))
+
 
 # calculate mahalanobis distances for cluster words on group means
 # get means & covariances for the group's ae and aeh means
