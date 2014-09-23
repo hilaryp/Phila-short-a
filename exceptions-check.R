@@ -64,18 +64,24 @@ for (speaker in levels(philasys$Subject)) {
 
 out2 <- out[-1,]
 all.mahal <- cbind(philasys, out2, row.names=NULL)
-all.mahal$closer <- as.factor(with(all.mahal, ifelse(mahal.ae < mahal.aeh, "ae", "aeh")))
-diff <- droplevels(subset(all.mahal, VClass!=closer))
-except <- droplevels(subset(all.mahal, Word %in% levels(diff$Word)))
-table <- with(except, table(Word, exceptions))
-sink('all.mahal.txt')
-prop.table(table, 1)
-sink()
-
+all.mahal$closer <- as.factor(with(all.mahal, 
+                                   ifelse(mahal.ae < mahal.aeh, "ae", "aeh")))
 all.mahal$exceptions <- as.factor(with(all.mahal, 
-                             ifelse(VClass==closer, as.character(VClass),
-                                    ifelse(VClass=='aeh' & closer=='ae', 'xlax',
-                                           'xtense'))))
+                                       ifelse(VClass==closer, as.character(VClass),
+                                              ifelse(VClass=='aeh' & closer=='ae', 'xlax',
+                                                     'xtense'))))
+# Find tokens coded differently by Mahal and FAVE
+diff <- droplevels(subset(all.mahal, VClass!=closer))
+# Get subset of words with variable coding
+except <- droplevels(subset(all.mahal, Word %in% levels(diff$Word)))
+# Remove words with less than 5 tokens
+counts <- as.data.frame(table(except$Word))
+except2 <- merge(except, counts, by.x="Word", by.y="Var1")
+except3 <- droplevels(subset(except2, Freq >=5))
+table <- with(except3, table(Word, exceptions))
+sink('all.mahal.txt')
+cbind(table, round(prop.table(table, 1), 2))
+sink()
 
 if (MAKE.PDF) {
   pdf(file = "allwords.pdf", width=6, height=5, onefile=TRUE)
