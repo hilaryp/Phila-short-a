@@ -1,8 +1,12 @@
-# September 2014
-# Short-a paper data processing
+#!/usr/bin/env Rscript
 
-setwd('~/Desktop/Phila-short-a/')
+# Short-a paper preliminary data processing
+
+# setwd('~/Desktop/Phila-short-a/')
 library(plyr)
+mel <- function(x) {
+  2595*log(1+(x/700))
+}
 
 # read in speaker demographics
 info <- read.csv("~/Desktop/Higher_Ed/Data/SpkInfo.csv")
@@ -39,12 +43,10 @@ STOPWORDS <- c('A', 'ALL', 'AM', 'AN', 'AND', "AN'", 'ARE', "AREN'T",
 olda4 <- droplevels(subset(olda3, !Word %in% STOPWORDS))
 newa4 <- droplevels(subset(newa3, !Word %in% STOPWORDS))
 
-olda5 <- ddply(olda4, .(Subject), transform, Z1=scale(F1), Z2=scale(F2), DOB=Year-Age)
-newa5 <- ddply(newa4, .(Subject), transform, Z1=scale(F1), Z2=scale(F2), DOB=Year-Age)
-
-mel <- function(x) {
-  2595*log(1+(x/700))
-}
+olda5 <- ddply(olda4, .(Subject), transform, Z1=scale(F1), Z2=scale(F2), 
+               DOB=Year-Age)
+newa5 <- ddply(newa4, .(Subject), transform, Z1=scale(F1), Z2=scale(F2), 
+               DOB=Year-Age)
 
 olda5$M1=mel(olda5$F1)
 olda5$M2=mel(olda5$F2)
