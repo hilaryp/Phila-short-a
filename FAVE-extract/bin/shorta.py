@@ -17,8 +17,7 @@ NEGATIVE_EXCEPTIONS = frozenset(['AM', 'RAN', 'SWAM', 'MATH', 'EXAM',
                                  'ASPECTS', 'ASPIRIN', 'ASPIRINS',
                                  'RASCAL', 'RASCALS',
                                  'ASPHALT', 'BLASPHEMY', 'ASTERISK',
-                                 'ATHLETE', 'CANYON', 'ANNE', 'ANNIE',
-                                 'JOANNE', 'MATTHEW'])
+                                 'ATHLETE', 'CANYON', 'MATTHEW'])
 POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST',
                                  'BADNESS', 'CLASSIC', 'CLASSICS',
                                  'DANNY', 'MAD', 'MADLY', 'MADDEN',
@@ -184,6 +183,7 @@ def is_tense(word, pron):
  
     Not handled yet: schwa-apocope (e.g., CAMERA), SANTA (when /t/ deleted)
     """
+    # normalize wordforms for lookup
     if word.endswith("IN'"):
         word = word[:-1] + 'G'
     if word.endswith("'S"):
