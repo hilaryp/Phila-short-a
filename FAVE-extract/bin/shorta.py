@@ -1,4 +1,4 @@
-#!/usr/bin/env python -O
+#!/usr/bin/env python
 # encoding: UTF-8
 
 from syllabify import syllabify
@@ -10,25 +10,27 @@ from stem import stem_infl as STEM
 # Prichard & Gorman forthcoming.
 
 TENSERS = frozenset(['M', 'N', 'S', 'TH', 'F'])
-NEGATIVE_EXCEPTIONS = frozenset(['AM', 'RAN', 'SWAM', 'MATH', 'EXAM', 
-                                 'ALAS', 'FAMILY', 'FAMILIES', "FAMILY'S",
-                                 'CATHOLIC', 'CATHOLICS', 'CAMERA', 
-                                 'CAMERAS', 'CATHERINE', "CATHERINE'S", 
-                                 'ASPECT', 'ASPECTS', 'ASPIRIN',
-                                 'ASPIRINS', 'RASCAL', 
-                                 'RASCALS', 'ASPHALT', 'BLASPHEMY'])
-POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST', 
-                                 'BADNESS', 'MAD', 'MADLY', 'MADDEN', 
-                                 'MADDENING', 'MADDENINGLY', 'MADDER', 
-                                 'MADNESS', 'GLAD', 'GLADLY', 'GLADDER', 
-                                 'GLADDEST', 'GLADDEN', 'GLADDENING', 
-                                 'GLADNESS', 'GRANDMOTHER', 'GRANDMOTHERS',
-                                 "GRANDMOTHER'S", 'GRANDMA', 'SANTA', 
-                                 'SANTAS', "SANTA'S", 'BATHROOM', 
-                                 'BATHROOMS'])
-UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'ANNE', 'ANNIE', 'PLASTIC', 
-                            'PLASTICS', 'PLANET', 'PLANETS', 'ALASKA', 
-                            'ALASKAN', 'FANTASTIC'])
+NEGATIVE_EXCEPTIONS = frozenset(['AM', 'RAN', 'SWAM', 'MATH', 'EXAM',
+                                 'ALAS', 'FAMILY', 'FAMILIES',
+                                 'CATHOLIC', 'CATHOLICS', 'CAMERA',
+                                 'CAMERAS', 'CATHERINE', 'ASPECT',
+                                 'ASPECTS', 'ASPIRIN', 'ASPIRINS',
+                                 'RASCAL', 'RASCALS',
+                                 'ASPHALT', 'BLASPHEMY', 'ASTERISK',
+                                 'ATHLETE', 'CANYON', 'ANNE', 'ANNIE',
+                                 'JOANNE', 'MATTHEW'])
+POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST',
+                                 'BADNESS', 'CLASSIC', 'CLASSICS',
+                                 'DANNY', 'MAD', 'MADLY', 'MADDEN',
+                                 'MADDENING', 'MADDENINGLY', 'MADDER',
+                                 'MADNESS', 'MASSIVE', 'GLAD', 'GLADLY',
+                                 'GLADDER', 'GLADDEST', 'GLADDEN',
+                                 'GLADDENING', 'GLADNESS', 'GRANDMOTHER',
+                                 'GRANDMOTHERS', "GRANDMOTHER'S",
+                                 'GRANDMA', 'SANTA', 'SANTAS', "SANTA'S",
+                                 'BATHROOM', 'BATHROOMS'])
+UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'PLASTIC', 'PLASTICS',
+                            'PLANET', 'PLANETS', 'ALASKA', 'ALASKAN'])
 
 
 def is_penultimate_syllable_resyllabified(word):
@@ -75,9 +77,8 @@ def is_tense(word, pron):
       system: so return True
     * Return False
 
-    Load CMU dictionary for testing (requires internet connection)
-    NB: this does not have appropriate handling for words with multiple
-    dictionary entries
+    Load CMU dictionary for testing (NB: this does not have appropriate 
+    handling for words with multiple dictionary entries)
 
     >>> pron = {}
     >>> for line in open("dict", "r"):
@@ -156,9 +157,8 @@ def is_tense(word, pron):
     (lexically) Unclassifiable:
     >>> is_tense('CAN', pron['CAN'])
     >>> is_tense('BEGAN', pron['BEGAN'])
-    >>> is_tense('ANNE', pron['ANNE'])
-    >>> is_tense('PLANET', pron['PLANET'])
     >>> is_tense('PLANETS', pron['PLANETS'])
+    >>> is_tense("PLANET'S", pron["PLANET'S"])
 
     Formerly unclassifiable sC:
     >>> is_tense('ASPECT', pron['ASPECT'])
@@ -186,6 +186,8 @@ def is_tense(word, pron):
     """
     if word.endswith("IN'"):
         word = word[:-1] + 'G'
+    if word.endswith("'S"):
+        word = word[:-2]
     # check lexical exceptions
     if word in UNCLASSIFIABLE:
         return None
