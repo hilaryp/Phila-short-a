@@ -45,9 +45,7 @@ def is_penultimate_syllable_resyllabified(word):
     # define the suffix to be the residue
     suffix = word[sp + 1:].upper()
     # check for /-z/, /-iŋ/, or /-iŋ-z/ therein
-    if suffix.endswith(("ED", "ES", "ING")):
-        if stem.endswith("G"):
-            return False
+    if suffix.endswith(("ED", "ES", "ING")) and not stem.endswith("G"):
         return True
     return False
 
