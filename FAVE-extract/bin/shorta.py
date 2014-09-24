@@ -25,8 +25,8 @@ POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST',
                                  'MADNESS', 'MASSIVE', 'GLAD', 'GLADLY',
                                  'GLADDER', 'GLADDEST', 'GLADDEN',
                                  'GLADDENING', 'GLADNESS', 'GRANDMOTHER',
-                                 'GRANDMOTHERS', "GRANDMOTHER'S",
-                                 'GRANDMA', 'SANTA', 'SANTAS', "SANTA'S",
+                                 'GRANDMOTHERS', "GRANDMOTHER",
+                                 'GRANDMA', 'SANTA', 'SANTAS', "SANTA",
                                  'BATHROOM', 'BATHROOMS'])
 UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'PLASTIC', 'PLASTICS',
                             'PLANET', 'PLANETS', 'ALASKA', 'ALASKAN'])
