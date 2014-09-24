@@ -186,8 +186,10 @@ def is_tense(word, pron):
     # normalize wordforms for lookup
     if word.endswith("IN'"):
         word = word[:-1] + 'G'
-    if word.endswith("'S"):
+    elif word.endswith("'S"):
         word = word[:-2]
+    elif word.endswith("'"):
+        word = word[:-1]
     # check lexical exceptions
     if word in UNCLASSIFIABLE:
         return None
