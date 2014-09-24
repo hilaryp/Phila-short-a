@@ -46,6 +46,8 @@ def is_penultimate_syllable_resyllabified(word):
     suffix = word[sp + 1:].upper()
     # check for /-z/, /-iŋ/, or /-iŋ-z/ therein
     if suffix.endswith(("ED", "ES", "ING")):
+        if stem.endswith("G"):
+            return False
         return True
     return False
 
@@ -140,6 +142,8 @@ def is_tense(word, pron):
     False
     >>> is_tense('MANAGE', pron['MANAGE'])
     False
+    >>> is_tense('MANAGED', pron['MANAGED'])
+    False
 
     Opaque tensing in (re)open(ed) syllables:
     >>> is_tense('MANNING', pron['MANNING'])
@@ -203,7 +207,7 @@ def is_tense(word, pron):
         if coda[0] in TENSERS:
             return True
     # check for the possibility of resyllabification opacifying tensing
-    if len(syls) == 2 and coda == []:
+    if len(syls) == 2 and not coda:
         if is_penultimate_syllable_resyllabified(word):
             resyl_onset = syls[1][0]
             if len(resyl_onset) == 1 and resyl_onset[0] in TENSERS:
