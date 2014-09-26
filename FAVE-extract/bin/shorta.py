@@ -10,26 +10,80 @@ from stem import stem_infl as STEM
 # Prichard & Gorman forthcoming.
 
 TENSERS = frozenset(['M', 'N', 'S', 'TH', 'F'])
-NEGATIVE_EXCEPTIONS = frozenset(['AM', 'RAN', 'SWAM', 'MATH', 'EXAM',
-                                 'ALAS', 'FAMILY', 'FAMILIES',
-                                 'CATHOLIC', 'CATHOLICS', 'CAMERA',
-                                 'CAMERAS', 'CATHERINE', 'ASPECT',
-                                 'ASPECTS', 'ASPIRIN', 'ASPIRINS',
+
+NEGATIVE_EXCEPTIONS = frozenset([# in the old `plotnik.py`, but validated:
+                                 'CAMERA', 'CAMERAS', 
+                                 'CATHOLIC', 'CATHOLICS', 
+                                 'EXAM', 'EXAMS',
+                                 'FAMILY', 'FAMILIES',
+                                 'JANUARY', 
+                                 'MATH',
+                                 'RAN', 
+                                 'SWAM',
+                                 # discovered earlier in our own work
+                                 'ASPHALT',
+                                 'BLASPHEMY',
                                  'RASCAL', 'RASCALS',
-                                 'ASPHALT', 'BLASPHEMY', 'ASTERISK',
-                                 'ATHLETE', 'CANYON', 'MATTHEW'])
-POSITIVE_EXCEPTIONS = frozenset(['BAD', 'BADLY', 'BADDER', 'BADDEST',
-                                 'BADNESS', 'CLASSIC', 'CLASSICS',
-                                 'DANNY', 'MAD', 'MADLY', 'MADDEN',
-                                 'MADDENING', 'MADDENINGLY', 'MADDER',
-                                 'MADNESS', 'MASSIVE', 'GLAD', 'GLADLY',
-                                 'GLADDER', 'GLADDEST', 'GLADDEN',
-                                 'GLADDENING', 'GLADNESS', 'GRANDMOTHER',
-                                 'GRANDMOTHERS', "GRANDMOTHER",
-                                 'GRANDMA', 'SANTA', 'SANTAS', "SANTA",
-                                 'BATHROOM', 'BATHROOMS'])
-UNCLASSIFIABLE = frozenset(['CAN', 'BEGAN', 'PLASTIC', 'PLASTICS',
-                            'PLANET', 'PLANETS', 'ALASKA', 'ALASKAN'])
+                                 # discovered using the Mahalanobis trick:
+                                 'ASPECT', 'ASPECTS',
+                                 'ASPIRIN', 'ASPIRINS',
+                                 'ASTERISK', 'ASTERISKS',
+                                 'ATHLETE', 'ATHLETES',
+                                 'CANYON', 'CANYONS',
+                                 'CATHERINE',
+                                 'JOANNE', # not like ANNE!
+                                 'MATTHEW'])
+
+POSITIVE_EXCEPTIONS = frozenset([# the famous MBG
+                                 'BAD', 'BADLY', 'BADDER', 'BADDEST',
+                                 'BADNESS', 
+                                 'GLAD', 'GLADLY', 'GLADDER', 'GLADDEST', 
+                                 'GLADDEN', 'GLADDENING', 'GLADNESS', 
+                                 'MAD', 'MADDEN', 'MADDENING', 
+                                 'MADDENINGLY', 'MADDER', 'MADDEST', 
+                                 'MADHOUSE', 'MADLY', 'MADNESS',
+                                 # discovered earlier in our own work
+                                 'BATHROOM', 'BATHROOMS',
+                                 'DANNY',
+                                 'SANTA', 'SANTAS',
+                                 # discovered using the Mahalanobis trick:
+                                 'ADVANTAGE',
+                                 'ANNIE',
+                                 'ATLANTIC',
+                                 'CLASSIC', 'CLASSICS',
+                                 'CLASSIFY', # made an executive decision
+                                 'GRAMMA', 'GRAMMAS', 'GRANDMA', 
+                                 'GRANDMAS', 'GRANDMOTHER', 'GRANDMOTHERS',
+                                 'HALFIES',
+                                 'MASSIVE', 
+                                 'SAL'])
+
+UNCLASSIFIABLE = frozenset([# in the old `plotnik.py`:
+                            'AND', "AN'", 'AM', 'AN', 'THAN',
+                            # lax in the old `plotnik.py`,
+                            # but we think they're unclassifiable:
+                            'ALAS', 'ANNUAL', 'BEGAN', 'CAN',
+                            # this is usually tense these days,
+                            # but it looks like a change in progress to me
+                            'PLANET', 'PLANETS',
+                            # before L:
+                            'AL', 'ALLEY', 'ALLEYS', 'ALLEYWAY',
+                            'BALANCE', 'BALANCES', 
+                            'GALLON', 'GALLONS', 
+                            'HALLAHAN', 'LASALLE',
+                            'MALLET', 'MALLETS',
+                            'NATIONALITY', 'NATIONALITIES',
+                            'PAL', 'PALS',
+                            'PERSONALITY', 'PERSONALITIES',
+                            'REALITY', 'REALITIES',
+                            'SALLY',
+                            'VALLEY', 'VALLEYS',
+                            'VALUE', 'VALUES',
+                            # discovered in earlier work
+                            'ALASKA', 'ALASKAN',
+                            'PLASTIC', 'PLASTICS',
+                            # discovered using the Mahalanobis trick:
+                            'PASSAGE', 'PASSAGES'])
 
 
 def is_penultimate_syllable_resyllabified(word):
@@ -96,6 +150,10 @@ def is_tense(word, pron):
     True
     >>> is_tense('GLADDEST', pron['GLADDEST'])
     True
+    >>> is_tense('PLANETS', pron['PLANETS'])
+    True
+    >>> is_tense("PLANET'S", pron["PLANET'S"])
+    True
 
     Negative exceptions:
     >>> is_tense('RAN', pron['RAN'])
@@ -128,8 +186,6 @@ def is_tense(word, pron):
     False
     >>> is_tense('BAT', pron['BAT'])
     False
-    >>> is_tense('PAL', pron['PAL'])
-    False
     >>> is_tense('BAG', pron['BAG'])
     False
     >>> is_tense('CAB', pron['CAB'])
@@ -156,8 +212,7 @@ def is_tense(word, pron):
     (lexically) Unclassifiable:
     >>> is_tense('CAN', pron['CAN'])
     >>> is_tense('BEGAN', pron['BEGAN'])
-    >>> is_tense('PLANETS', pron['PLANETS'])
-    >>> is_tense("PLANET'S", pron["PLANET'S"])
+    >>> is_tense('PAL', pron['PAL'])
 
     Formerly unclassifiable sC:
     >>> is_tense('ASPECT', pron['ASPECT'])
