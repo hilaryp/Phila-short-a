@@ -55,20 +55,15 @@ olda7 <- ddply(olda6, .(Subject), transform, MZ1=scale(M1), MZ2=scale(M2))
 olda8 <- droplevels(subset(olda7, VClass %in% c('ae','aeh','aeBR')))
 #newa8 <- droplevels(subset(newa6, VClass %in% c('ae','aeh','aeBR')))
 
-# Remove words with less than 5 tokens
-counts <- as.data.frame(table(olda8$Word))
-olda9 <- merge(olda8, counts, by.x="Word", by.y="Var1")
-olda10 <- droplevels(subset(olda9, Freq >=5))
-
 # Remove speakers with less than 5 tokens in each category
-for (speaker in levels(olda10$Subject)) {
+for (speaker in levels(olda8$Subject)) {
   data <- subset(olda10, Subject==speaker)
   ae.d <- data[data$VClass=="ae", ]
   aeh.d <- data[data$VClass=="aeh", ]
   if(nrow(ae.d) < 5 | nrow(aeh.d) < 5) print(speaker)
 }
 
-oldaf <- droplevels(subset(olda10, !Subject %in% c("PH10-2-10", "PH10-2-11",
+oldaf <- droplevels(subset(olda8, !Subject %in% c("PH10-2-10", "PH10-2-11",
                     "PH74-00-6", "PH78-5-3", "PH79-3-8", "PH79-4-5",
                     "PH80-2-8", "PH84-1-3", "PH84-2-10", "PH85-3-8",
                     "PH86-3-3", "PH90-2-2", "PH91-2-19", "PH91-2-21",
