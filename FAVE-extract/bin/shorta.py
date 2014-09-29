@@ -4,35 +4,31 @@
 from syllabify import syllabify
 from stem import stem_infl as STEM
 
-# List of exceptions derived from Ferguson 1972, Labov 1989, and Labov 
-# 1994. Additional items included to counteract CMU pronunication 
-# variations and as the result of sC cluster analysis presented in 
-# Prichard & Gorman forthcoming.
-
 TENSERS = frozenset(['M', 'N', 'S', 'TH', 'F'])
 
-NEGATIVE_EXCEPTIONS = frozenset([# in the old `plotnik.py`, but validated:
-                                 'CAMERA', 'CAMERAS', 
-                                 'CATHOLIC', 'CATHOLICS', 
-                                 'EXAM', 'EXAMS',
-                                 'FAMILY', 'FAMILIES',
+# Items marked CMU are only included to account for problmatic CMU entries
+
+NEGATIVE_EXCEPTIONS = frozenset([# in the old `plotnik.py`, and validated:
+                                 'CAMERA', 'CAMERAS', # CMU
+                                 'CATHOLIC', 'CATHOLICS', # CMU
+                                 'FAMILY', 'FAMILIES', # CMU
                                  'JANUARY', 
                                  'MATH',
+                                 'EXAM', 'EXAMS',
                                  'RAN', 
                                  'SWAM',
                                  # discovered earlier in our own work
-                                 'ASPHALT',
-                                 'BLASPHEMY',
                                  'RASCAL', 'RASCALS',
+                                 'ATHLETE', 'ATHLETES',
+                                 'CANYON', 'CANYONS',
+                                 'CATHERINE',
+                                 'MATTHEW',
                                  # discovered using the Mahalanobis trick:
                                  'ASPECT', 'ASPECTS',
                                  'ASPIRIN', 'ASPIRINS',
                                  'ASTERISK', 'ASTERISKS',
-                                 'ATHLETE', 'ATHLETES',
-                                 'CANYON', 'CANYONS',
-                                 'CATHERINE',
-                                 'JOANNE', # not like ANNE!
-                                 'MATTHEW'])
+                                 'ASTEROID', 'ASTEROIDS',
+                                 'JOANNE']) # not like ANNE!
 
 POSITIVE_EXCEPTIONS = frozenset([# the famous MBG
                                  'BAD', 'BADLY', 'BADDER', 'BADDEST',
@@ -43,20 +39,17 @@ POSITIVE_EXCEPTIONS = frozenset([# the famous MBG
                                  'MADDENINGLY', 'MADDER', 'MADDEST', 
                                  'MADHOUSE', 'MADLY', 'MADNESS',
                                  # discovered earlier in our own work
-                                 'BATHROOM', 'BATHROOMS',
-                                 'DANNY',
-                                 'SANTA', 'SANTAS',
+                                 'BATHROOM', 'BATHROOMS', # maxonset issue
+                                 'SANTA', 'SANTAS', # CMU
                                  # discovered using the Mahalanobis trick:
-                                 'ADVANTAGE',
-                                 'ANNIE',
-                                 'ATLANTIC',
+                                 'ADVANTAGE', # CMU
+                                 'ATLANTIC', # CMU
                                  'CLASSIC', 'CLASSICS',
                                  'CLASSIFY', # made an executive decision
-                                 'GRAMMA', 'GRAMMAS', 'GRANDMA', 
+                                 'GRAMMA', 'GRAMMAS', 'GRANDMA', # CMU
                                  'GRANDMAS', 'GRANDMOTHER', 'GRANDMOTHERS',
                                  'HALFIES',
-                                 'MASSIVE', 
-                                 'SAL'])
+                                 'MASSIVE'])
 
 UNCLASSIFIABLE = frozenset([# in the old `plotnik.py`:
                             'AND', "AN'", 'AM', 'AN', 'THAN',
@@ -64,26 +57,11 @@ UNCLASSIFIABLE = frozenset([# in the old `plotnik.py`:
                             # but we think they're unclassifiable:
                             'ALAS', 'ANNUAL', 'BEGAN', 'CAN',
                             # this is usually tense these days,
-                            # but it looks like a change in progress to me
+                            # but it looks like a change in progress 
                             'PLANET', 'PLANETS',
-                            # before L:
-                            'AL', 'ALLEY', 'ALLEYS', 'ALLEYWAY',
-                            'BALANCE', 'BALANCES', 
-                            'GALLON', 'GALLONS', 
-                            'HALLAHAN', 'LASALLE',
-                            'MALLET', 'MALLETS',
-                            'NATIONALITY', 'NATIONALITIES',
-                            'PAL', 'PALS',
-                            'PERSONALITY', 'PERSONALITIES',
-                            'REALITY', 'REALITIES',
-                            'SALLY',
-                            'VALLEY', 'VALLEYS',
-                            'VALUE', 'VALUES',
-                            # discovered in earlier work
-                            'ALASKA', 'ALASKAN',
-                            'PLASTIC', 'PLASTICS',
                             # discovered using the Mahalanobis trick:
-                            'PASSAGE', 'PASSAGES'])
+                            'PASSAGE', 'PASSAGES'
+                            'FANTASTIC', 'FANTASTICALLY'])
 
 
 def is_penultimate_syllable_resyllabified(word):
@@ -150,10 +128,6 @@ def is_tense(word, pron):
     True
     >>> is_tense('GLADDEST', pron['GLADDEST'])
     True
-    >>> is_tense('PLANETS', pron['PLANETS'])
-    True
-    >>> is_tense("PLANET'S", pron["PLANET'S"])
-    True
 
     Negative exceptions:
     >>> is_tense('RAN', pron['RAN'])
@@ -202,7 +176,7 @@ def is_tense(word, pron):
     Opaque tensing in (re)open(ed) syllables:
     >>> is_tense('MANNING', pron['MANNING'])
     True
-    >>> is_tense('CLASSES', pron['CLASSES'])
+    >>> is_tense('MASSES', pron['MASSES'])
     True
     >>> is_tense('ASKING', pron['ASKING'])
     True
@@ -212,7 +186,10 @@ def is_tense(word, pron):
     (lexically) Unclassifiable:
     >>> is_tense('CAN', pron['CAN'])
     >>> is_tense('BEGAN', pron['BEGAN'])
-    >>> is_tense('PAL', pron['PAL'])
+    >>> is_tense('PAL', pron['PAL'][1:])
+    >>> is_tense('SALAD', pron['SALAD'][1:])
+    >>> is_tense('PLANETS', pron['PLANETS'])
+    >>> is_tense("PLANET'S", pron["PLANET'S"])
 
     Formerly unclassifiable sC:
     >>> is_tense('ASPECT', pron['ASPECT'])
@@ -236,7 +213,7 @@ def is_tense(word, pron):
     >>> is_tense('TRANSFER', pron['TRANSFER'])
     True
  
-    Not handled yet: schwa-apocope (e.g., CAMERA), SANTA (when /t/ deleted)
+    Not handled programmatically yet: schwa-apocope (CAMERA), /t/ deleted (SANTA)
     """
     # normalize wordforms for lookup
     if word.endswith("IN'"):
@@ -252,6 +229,9 @@ def is_tense(word, pron):
         return True
     if word in NEGATIVE_EXCEPTIONS:
         return False    
+    # exclude pre-/l/ tokens
+    if pron[1] == 'L':
+        return None
     # parse syllables, with "Alaska rule" ON 
     syls = syllabify(pron)
     (onset, nucleus, coda) = syls[0]
