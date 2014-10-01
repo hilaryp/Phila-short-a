@@ -3,6 +3,7 @@ Educational attainment and the retreat from the Philadelphia short-a system
 1. Introduction
     * Socioeconomic status plays a role in linguistic stratification; it is a multidimensional construct, one element being education
     * Indeed, there is some reason to think that educational attainment might be particularly important for our understanding of local sound change
+        [Here I need to dig into lit on education & prestige, attitudes surrounding "localness" -HP]
     * Traditional way to operationalize it: college vs. not
     * Prichard & Tamminga's alternative
     * Outline
@@ -35,7 +36,7 @@ Educational attainment and the retreat from the Philadelphia short-a system
     C. Discussion
         * Social stratification of the change in progress
         * Consistency with hypotheses about educational attainment effects
-5. A comparison with (eyF)
+5. A comparison with (eyC)
     A. The variable
         * Definition
         * Labov 2001; Labov et al. 2013
