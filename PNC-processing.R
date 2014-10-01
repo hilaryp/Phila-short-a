@@ -52,7 +52,7 @@ olda6 <- transform(olda5, M1=mel(F1), M2=mel(F2))
 olda7 <- ddply(olda6, .(Subject), transform, MZ1=scale(M1), MZ2=scale(M2))
 #newa6 <- ddply(newa5, .(Subject), transform, MZ1=scale(M1), MZ2=scale(M2))
 
-olda8 <- droplevels(subset(olda7, VClass %in% c('ae','aeh','aeBR')))
+olda8 <- droplevels(subset(olda7, VClass %in% c('ae','aeh','aeBR') & Stress == 1))
 #newa8 <- droplevels(subset(newa6, VClass %in% c('ae','aeh','aeBR')))
 
 # Remove speakers with less than 5 tokens in each category
@@ -67,8 +67,7 @@ oldaf <- droplevels(subset(olda8, !Subject %in% c("PH10-2-10", "PH10-2-11",
                     "PH74-00-6", "PH78-5-3", "PH79-3-8", "PH79-4-5",
                     "PH80-2-8", "PH84-1-3", "PH84-2-10", "PH85-3-8",
                     "PH86-3-3", "PH90-2-2", "PH91-2-19", "PH91-2-21",
-                    "PH91-2-3", "PH91-2-8", "PH94-1-1")
-                    & Stress == 1))
+                    "PH91-2-3", "PH91-2-8", "PH94-1-1")))
 
 write.csv(oldaf, "shorta-old.csv", row.names=FALSE, quote=FALSE)
 write.csv(newaf, "shorta-new.csv", row.names=FALSE, quote=FALSE)
