@@ -27,8 +27,7 @@ NEGATIVE_EXCEPTIONS = frozenset([# in the old `plotnik.py`, and validated:
                                  'ASPECT', 'ASPECTS',
                                  'ASPIRIN', 'ASPIRINS',
                                  'ASTERISK', 'ASTERISKS',
-                                 'ASTEROID', 'ASTEROIDS',
-                                 'JOANNE']) # not like ANNE!
+                                 'ASTEROID', 'ASTEROIDS'])
 
 POSITIVE_EXCEPTIONS = frozenset([# the famous MBG
                                  'BAD', 'BADLY', 'BADDER', 'BADDEST',
@@ -42,14 +41,11 @@ POSITIVE_EXCEPTIONS = frozenset([# the famous MBG
                                  'BATHROOM', 'BATHROOMS', # maxonset issue
                                  'SANTA', 'SANTAS', # CMU
                                  # discovered using the Mahalanobis trick:
-                                 'ADVANTAGE', # CMU
-                                 'ATLANTIC', # CMU
                                  'CLASSIC', 'CLASSICS',
                                  'CLASSIFY', # made an executive decision
                                  'GRAMMA', 'GRAMMAS', 'GRANDMA', # CMU
                                  'GRANDMAS', 'GRANDMOTHER', 'GRANDMOTHERS',
-                                 'HALFIES',
-                                 'MASSIVE'])
+                                 'HALFIES', 'MASSIVE', 'DANNY'])
 
 UNCLASSIFIABLE = frozenset([# in the old `plotnik.py`:
                             'AND', "AN'", 'AM', 'AN', 'THAN',
@@ -60,8 +56,11 @@ UNCLASSIFIABLE = frozenset([# in the old `plotnik.py`:
                             # but it looks like a change in progress 
                             'PLANET', 'PLANETS',
                             # discovered using the Mahalanobis trick:
-                            'PASSAGE', 'PASSAGES'
-                            'FANTASTIC', 'FANTASTICALLY'])
+                            'PASSAGE', 'PASSAGES',
+                            'FANTASTIC', 'FANTASTICALLY',
+                            'GANG', 'GANGS', 
+                            'HALVE', 'HALVES',
+                            'INDIANA', 'JOANNE', 'MIAMI', 'WHEREAS'])
 
 
 def is_penultimate_syllable_resyllabified(word):
