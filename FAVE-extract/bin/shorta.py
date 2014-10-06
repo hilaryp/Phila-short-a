@@ -60,7 +60,10 @@ UNCLASSIFIABLE = frozenset([# in the old `plotnik.py`:
                             'FANTASTIC', 'FANTASTICALLY',
                             'GANG', 'GANGS', 
                             'HALVE', 'HALVES',
-                            'INDIANA', 'JOANNE', 'MIAMI', 'WHEREAS'])
+                            'INDIANA', 'JOANNE', 'MIAMI', 'WHEREAS',
+                            # CMU but can't hard-code because two tokens
+                            'ADVANTAGE', 'ADVANTAGES',
+                            'ATLANTIC', 'ATLANTA'])
 
 
 def is_penultimate_syllable_resyllabified(word):
