@@ -10,8 +10,8 @@ digraph coding {
     edge [fontname="serif"];
 
     // vertices
-    "posexcept?"     [label=<Is the word a positive exception (<i>mad</i>, <i>bad</i>, <i>glad</i>)?>];
-    "negexcept?"     [label=<Is the word a negative exception (<i>aspirin</i>, <i>Catholic</i>)?>];
+    "posexcept?"     [label=<Positive exception (<i>mad</i>, <i>bad</i>, <i>glad</i>)?>];
+    "negexcept?"     [label=<Negative exception (<i>aspirin</i>, <i>Catholic</i>)?>];
     "tenser?"        [label="Following {m, n, f, θ, s}?"];
     "closed?"        [label="Is the syllable closed?"];
     
