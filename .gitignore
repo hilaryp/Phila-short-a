@@ -54,3 +54,8 @@ docs/_build/
 
 # Mac OS X DS_Store
 .DS_Store
+
+# R stuff
+.RData
+.Rapp.history
+.Rhistory
